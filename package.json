@@ -1,7 +1,7 @@
 {
   "name": "sahha-capacitor",
   "version": "0.0.1",
-  "description": "Sahha Cordova Plugin",
+  "description": "Sahha Capacitor Plugin",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -14,7 +14,7 @@
     "SahhaCapacitor.podspec"
   ],
   "author": "Sahha",
-  "license": "MIT",
+  "license": "Sahha SDK License",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sahha-ai/sahha-capacitor.git"
