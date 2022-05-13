@@ -19,6 +19,7 @@ npx cap sync
 * [`postDemographic(...)`](#postdemographic)
 * [`getSensorStatus(...)`](#getsensorstatus)
 * [`enableSensor(...)`](#enablesensor)
+* [`postSensorData(...)`](#postsensordata)
 * [`analyze(...)`](#analyze)
 * [`openAppSettings()`](#openappsettings)
 * [Interfaces](#interfaces)
@@ -111,6 +112,21 @@ enableSensor(options: { sensor: SahhaSensor; }) => Promise<{ status: SahhaSensor
 | **`options`** | <code>{ sensor: <a href="#sahhasensor">SahhaSensor</a>; }</code> |
 
 **Returns:** <code>Promise&lt;{ status: <a href="#sahhasensorstatus">SahhaSensorStatus</a>; }&gt;</code>
+
+--------------------
+
+
+### postSensorData(...)
+
+```typescript
+postSensorData(options?: { sensors: [SahhaSensor]; } | undefined) => Promise<{ success: boolean; }>
+```
+
+| Param         | Type                                     |
+| ------------- | ---------------------------------------- |
+| **`options`** | <code>{ sensors: [SahhaSensor]; }</code> |
+
+**Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
 --------------------
 

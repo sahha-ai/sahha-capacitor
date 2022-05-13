@@ -147,6 +147,47 @@ public class SahhaPlugin: CAPPlugin {
         }
     }
     
+    @objc func postSensorData(_ call: CAPPluginCall) {
+        if let sensors = call.getArray("sensors") as? [String]
+        {
+            var sahhaSensors: Set<SahhaSensor> = []
+            for sensor in sensors {
+                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+                    sahhaSensors.insert(sahhaSensor)
+                } else {
+                    call.reject("Sahha sensor parameter \(sensor) is not valid")
+                    return
+                }
+            }
+            if sahhaSensors.isEmpty {
+                call.reject("Sahha sensors parameter is empty")
+                return
+            } else {
+                Sahha.postSensorData(sahhaSensors) { error, success in
+                    if let error = error {
+                        call.reject(error)
+                    } else {
+                        call.resolve([
+                            "success": success
+                        ]
+                        )
+                    }
+                }
+            }
+        } else {
+            Sahha.postSensorData() { error, success in
+                if let error = error {
+                    call.reject(error)
+                } else {
+                    call.resolve([
+                        "success": success
+                    ]
+                    )
+                }
+            }
+        }
+    }
+    
     @objc func analyze(_ call: CAPPluginCall) {
         if let startDate = call.getDate("startDate"), let endDate = call.getDate("endDate") {
             Sahha.analyze(dates: (startDate: startDate, endDate: endDate)) { error, value in
