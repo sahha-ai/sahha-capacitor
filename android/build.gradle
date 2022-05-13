@@ -11,6 +11,7 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
+        maven { url 'https://www.jitpack.io' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
@@ -49,6 +50,7 @@ repositories {
     google()
     mavenCentral()
     jcenter()
+    maven { url 'https://www.jitpack.io' }
 }
 
 
@@ -61,4 +63,5 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.github.sahha-ai:sahha-android:0.11.4"
 }
