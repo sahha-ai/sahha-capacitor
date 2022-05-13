@@ -25,8 +25,12 @@ public class SahhaPlugin: CAPPlugin {
                 if let postSensorDataManually = settings["postSensorDataManually"] as? Bool {
                     sahhaSettings.postSensorDataManually = postSensorDataManually
                 }
-                print(sahhaSettings)
+
                 Sahha.configure(sahhaSettings)
+                
+                // Needed for Ionic Capacitor since native iOS lifecycle is delayed at launch
+                Sahha.launch()
+                
                 call.resolve([
                     "success": true
                 ])
