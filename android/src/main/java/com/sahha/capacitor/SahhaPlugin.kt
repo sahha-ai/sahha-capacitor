@@ -1,11 +1,13 @@
 package com.sahha.capacitor
 
-import com.getcapacitor.JSObject
-import com.getcapacitor.Plugin
-import com.getcapacitor.PluginCall
-import com.getcapacitor.PluginMethod
+import android.util.Log
+import androidx.annotation.NonNull
+import com.getcapacitor.*
 import com.getcapacitor.annotation.CapacitorPlugin
 import sdk.sahha.android.source.*
+import java.util.*
+import com.google.gson.Gson
+import org.json.JSONArray
 
 @CapacitorPlugin(name = "Sahha")
 class SahhaPlugin : Plugin() {
@@ -20,124 +22,146 @@ class SahhaPlugin : Plugin() {
 
     @PluginMethod
     fun configure(call: PluginCall) {
+
         var settings: JSObject? = call.getObject("settings")
 
-        if (settings != null) {
-
-            var environment: String? = settings.getString("environment")
-            if (environment != null) {
-
-                var sahhaEnvironment: SahhaEnvironment
-                try {
-                    sahhaEnvironment = SahhaEnvironment.valueOf(environment)
-                } catch (e: IllegalArgumentException) {
-                    call.reject("Sahha configure environment parameter is not valid")
-                    return
-                }
-
-                var sahhaSettings = SahhaSettings(sahhaEnvironment)
-
-                var app = activity?.application
-                if (app != null) {
-                    Sahha.configure(app, SahhaSettings(SahhaEnvironment.development))
-                    val data = JSObject()
-                    data.put("success", true)
-                    call.resolve(data)
-                } else {
-                    call.reject("Sahha configure app is missing")
-                }
-            } else {
-            call.reject("Sahha settings environment parameter is missing")
-        }
-        } else {
+        if (settings == null) {
             call.reject("Sahha settings parameter is missing")
+            return
+        }
+
+        var environment: String? = settings.getString("environment")
+        if (environment == null) {
+            call.reject("Sahha settings environment parameter is missing")
+            return
+        }
+
+        var sahhaEnvironment: SahhaEnvironment
+        try {
+            sahhaEnvironment = SahhaEnvironment.valueOf(environment)
+        } catch (e: IllegalArgumentException) {
+            call.reject("Sahha configure environment parameter is not valid")
+            return
+        }
+
+        var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf<SahhaSensor>()
+        if (settings.has("sensors")) {
+            try {
+                var sensors: JSONArray = settings.getJSONArray("sensors")
+                for (i in 0 until sensors.length()) {
+                    var sensor: String = sensors.getString(i)
+                    var sahhaSensor = SahhaSensor.valueOf(sensor)
+                    sahhaSensors.add(sahhaSensor)
+                }
+            } catch (e: IllegalArgumentException) {
+                call.reject("Sahha sensor parameter is not valid")
+                return
+            }
+        } else {
+            for (sensor in SahhaSensor.values()) {
+                sahhaSensors.add(sensor)
+            }
+        }
+
+        var postSensorDataManually: Boolean = settings.getBoolean("postSensorDataManually", false) ?: false
+
+        var sahhaSettings = SahhaSettings(sahhaEnvironment, SahhaFramework.capacitor, sahhaSensors, postSensorDataManually)
+
+        var app = activity?.application
+        if (app == null) {
+            call.reject("Sahha configure app is missing")
+        } else {
+            Sahha.configure(app, sahhaSettings)
+            val data = JSObject()
+            data.put("success", true)
+            call.resolve(data)
         }
     }
-/*
-    @objc func authenticate(_ call: CAPPluginCall) {
-        guard let profileToken = call.getString("profileToken") else {
+
+    @PluginMethod
+    fun authenticate(call: PluginCall) {
+
+        var profileToken: String? = call.getString("profileToken");
+        if (profileToken == null) {
             call.reject("Sahha authenticate profileToken parameter is missing")
             return
         }
-        guard let refreshToken = call.getString("refreshToken") else {
+
+        var refreshToken: String? = call.getString("refreshToken");
+        if (refreshToken == null) {
             call.reject("Sahha authenticate refreshToken parameter is missing")
             return
         }
 
-        let success = Sahha.authenticate(profileToken: profileToken, refreshToken: refreshToken)
-        if success {
-            call.resolve([
-                "success": true
-            ])
-        } else {
-            call.reject("Sahha authenticate was not successful")
+        Sahha.authenticate(profileToken, refreshToken)
+        { error, success ->
+            if (error != null) {
+                call.reject(error);
+            } else {
+                val data = JSObject()
+                data.put("success", true)
+                call.resolve(data);
+            }
         }
     }
 
-    @objc func getDemographic(_ call: CAPPluginCall) {
-        Sahha.getDemographic { error, value in
-            if let error = error {
+    @PluginMethod
+    fun getDemographic(call: PluginCall) {
+
+        Sahha.getDemographic() { error, demographic ->
+            if (error != null) {
                 call.reject(error)
-            } else if let value = value {
-                do {
-                    let jsonEncoder = JSONEncoder()
-                    jsonEncoder.outputFormatting = .prettyPrinted
-                            let jsonData = try jsonEncoder.encode(value)
-                        if let string = String(data: jsonData, encoding: .utf8) {
-                            call.resolve(["value": string])
-                        } else {
-                            call.reject("Sahha demographic data error")
-                        }
-                    } catch let encodingError {
-                        print(encodingError)
-                        call.reject(encodingError.localizedDescription)
-                    }
-                } else {
-                call.reject("Sahha demographic is not available")
+            } else if (demographic != null) {
+                val gson = Gson()
+                val demographicJson: String = gson.toJson(demographic)
+                Log.d("Sahha", demographicJson)
+                val data = JSObject()
+                data.put("value", demographicJson)
+                call.resolve(data)
+            } else {
+                call.reject("Sahha demographic not available")
             }
         }
     }
 
-    @objc func postDemographic(_ call: CAPPluginCall) {
-        if let demographic = call.getObject("demographic") {
+    @PluginMethod
+    fun postDemographic(call: PluginCall) {
 
-            var sahhaDemographic = SahhaDemographic()
+        var demographic:JSObject? = call.getObject("demographic")
 
-            if let ageNumber = demographic["age"] as? NSNumber {
-                let age = ageNumber.intValue
-                        sahhaDemographic.age = age
-            }
-
-            if let gender = demographic["gender"] as? String {
-                sahhaDemographic.gender = gender
-            }
-
-            if let country = demographic["country"] as? String {
-                sahhaDemographic.country = country
-            }
-
-            if let birthCountry = demographic["birthCountry"] as? String {
-                sahhaDemographic.birthCountry = birthCountry
-            }
-
-            Sahha.postDemographic(sahhaDemographic) { error, success in
-                if let error = error {
-                    call.reject(error)
-                } else {
-                    call.resolve(["success" : success])
-                }
-            }
-
-        } else {
+        if (demographic == null) {
             call.reject("Sahha demographic parameter is missing")
+            return
+        }
+
+        val age: Int? = demographic.getInt("age")
+        val gender: String? = demographic.getString("gender")
+        val country: String? = demographic.getString("country")
+        val birthCountry: String? = demographic.getString("birthCountry")
+
+        var sahhaDemographic = SahhaDemographic(age, gender, country, birthCountry)
+        Log.d("Sahha", sahhaDemographic.toString())
+
+        Sahha.postDemographic(sahhaDemographic) { error, success ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val data = JSObject()
+                data.put("success", success)
+                call.resolve(data)
+            }
         }
     }
-*/
-@PluginMethod
-fun getSensorStatus(call: PluginCall) {
 
-    var sensor: String? = call.getString("sensor")
-    if (sensor != null) {
+    @PluginMethod
+    fun getSensorStatus(call: PluginCall) {
+
+        var sensor: String? = call.getString("sensor")
+        if (sensor == null) {
+            call.reject("Sahha sensor parameter is missing")
+            return
+        }
+
         try {
             var sahhaSensor = SahhaSensor.valueOf(sensor)
             Sahha.getSensorStatus(
@@ -155,74 +179,105 @@ fun getSensorStatus(call: PluginCall) {
         } catch (e: IllegalArgumentException) {
             call.reject("Sahha sensor parameter is not valid")
         }
-    } else {
-        call.reject("Sahha sensor parameter is missing")
     }
-}
 
     @PluginMethod
     fun enableSensor(call: PluginCall) {
 
         var sensor: String? = call.getString("sensor")
-        if (sensor != null) {
-            try {
-                var sahhaSensor = SahhaSensor.valueOf(sensor)
-                Sahha.enableSensor(
-                    context,
-                    sahhaSensor
-                ) { error, sensorStatus ->
-                    if (error != null) {
-                        call.reject(error)
-                    } else {
-                        val data = JSObject()
-                        data.put("status", sensorStatus.ordinal)
-                        call.resolve(data)
-                    }
-                }
-            } catch (e: IllegalArgumentException) {
-                call.reject("Sahha sensor parameter is not valid")
-            }
-        } else {
+        if (sensor == null) {
             call.reject("Sahha sensor parameter is missing")
+            return
+        }
+
+        try {
+            var sahhaSensor = SahhaSensor.valueOf(sensor)
+            Sahha.enableSensor(
+                context,
+                sahhaSensor
+            ) { error, sensorStatus ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("status", sensorStatus.ordinal)
+                    call.resolve(data)
+                }
+            }
+        } catch (e: IllegalArgumentException) {
+            call.reject("Sahha sensor parameter is not valid")
         }
     }
 
-    /*
+    @PluginMethod
+    fun postSensorData(call: PluginCall) {
+
+        var sensors: JSArray? = call.getArray("sensors")
+        if (sensors == null) {
+            Sahha.postSensorData { error, success ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("success", success)
+                    call.resolve(data)
+                }
+            }
+        } else {
+            var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf<SahhaSensor>()
+            for (sensor in sensors.toList<String>()) {
+                try {
+                    var sahhaSensor = SahhaSensor.valueOf(sensor)
+                    sahhaSensors.add(sahhaSensor)
+                } catch (e: IllegalArgumentException) {
+                    call.reject("Sahha sensor parameter $sensor is not valid")
+                    return
+                }
+            }
+            Sahha.postSensorData(sahhaSensors) { error, success ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("success", success)
+                    call.resolve(data)
+                }
+            }
+        }
+    }
+
     @PluginMethod
     fun analyze(call: PluginCall) {
-    val name: String = call.getObject("startDate")
-        if let startDate = call.getDate("startDate"), let endDate = call.getDate("endDate") {
-            Sahha.analyze(dates: (startDate: startDate, endDate: endDate)) { error, value in
-            if let error = error {
+
+        val startDate: String? = call.getString("startDate")
+        if (startDate != null) {
+            Log.d("Sahha", "startDate $startDate")
+        } else {
+            Log.d("Sahha", "startDate missing")
+        }
+
+        val endDate: String? = call.getString("endDate")
+        if (endDate != null) {
+            Log.d("Sahha", "endDate $endDate")
+        } else {
+            Log.d("Sahha", "endDate missing")
+        }
+
+        Sahha.analyze() { error, value ->
+            if (error != null) {
                 call.reject(error)
-            } else if let value = value {
-                call.resolve([
-                    "value": value
-                ]
-                )
+            } else if (value != null) {
+                val data = JSObject()
+                data.put("value", value)
+                call.resolve(data)
             } else {
                 call.reject("Sahha analyze is not available")
             }
         }
-        } else {
-            Sahha.analyze { error, value in
-                if let error = error {
-                    call.reject(error)
-                } else if let value = value {
-                    call.resolve([
-                        "value": value
-                    ]
-                    )
-                } else {
-                    call.reject("Sahha analyze is not available")
-                }
-            }
-        }
     }
-*/
 
     @PluginMethod
     fun openAppSettings(call: PluginCall) {
-        Sahha.openAppSettings(context.applicationContext)
+        Sahha.openAppSettings(context)
     }
 }
