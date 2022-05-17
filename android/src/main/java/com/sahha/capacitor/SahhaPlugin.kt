@@ -249,20 +249,6 @@ class SahhaPlugin : Plugin() {
     @PluginMethod
     fun analyze(call: PluginCall) {
 
-        val startDate: String? = call.getString("startDate")
-        if (startDate != null) {
-            Log.d("Sahha", "startDate $startDate")
-        } else {
-            Log.d("Sahha", "startDate missing")
-        }
-
-        val endDate: String? = call.getString("endDate")
-        if (endDate != null) {
-            Log.d("Sahha", "endDate $endDate")
-        } else {
-            Log.d("Sahha", "endDate missing")
-        }
-
         Sahha.analyze() { error, value ->
             if (error != null) {
                 call.reject(error)
