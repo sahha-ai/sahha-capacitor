@@ -189,31 +189,16 @@ public class SahhaPlugin: CAPPlugin {
     }
     
     @objc func analyze(_ call: CAPPluginCall) {
-        if let startDate = call.getDate("startDate"), let endDate = call.getDate("endDate") {
-            Sahha.analyze(dates: (startDate: startDate, endDate: endDate)) { error, value in
-                if let error = error {
-                    call.reject(error)
-                } else if let value = value {
-                    call.resolve([
-                        "value": value
-                    ]
-                    )
-                } else {
-                    call.reject("Sahha analyze is not available")
-                }
-            }
-        } else {
-            Sahha.analyze { error, value in
-                if let error = error {
-                    call.reject(error)
-                } else if let value = value {
-                    call.resolve([
-                        "value": value
-                    ]
-                    )
-                } else {
-                    call.reject("Sahha analyze is not available")
-                }
+        Sahha.analyze { error, value in
+            if let error = error {
+                call.reject(error)
+            } else if let value = value {
+                call.resolve([
+                    "value": value
+                ]
+                )
+            } else {
+                call.reject("Sahha analyze is not available")
             }
         }
     }
