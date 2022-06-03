@@ -189,7 +189,18 @@ public class SahhaPlugin: CAPPlugin {
     }
     
     @objc func analyze(_ call: CAPPluginCall) {
-        Sahha.analyze { error, value in
+        var dates: (startDate: Date, endDate: Date)?
+        if let startDateNumber = call.getInt("startDate"), let endDateNumber = call.getInt("endDate") {
+            let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber / 1000))
+            let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber / 1000))
+            dates = (startDate, endDate)
+            print("startDate", startDate.toTimezoneFormat)
+            print("endDate", endDate.toTimezoneFormat)
+        } else {
+            print("no dates")
+        }
+        
+        Sahha.analyze(dates: dates) { error, value in
             if let error = error {
                 call.reject(error)
             } else if let value = value {

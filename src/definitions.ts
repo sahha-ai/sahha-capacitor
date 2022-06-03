@@ -37,6 +37,6 @@ export interface SahhaPlugin {
   getSensorStatus(options: { sensor: SahhaSensor }): Promise<{ status: SahhaSensorStatus }>;
   enableSensor(options: { sensor: SahhaSensor }): Promise<{ status: SahhaSensorStatus }>;
   postSensorData(options?: { sensors: [SahhaSensor] }): Promise<{ success: boolean }>;
-  analyze(options?: { startDate: Date, endDate: Date }): Promise<{ value: string }>;
+  analyze(options?: { startDate: number, endDate: number }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
 }

@@ -249,15 +249,43 @@ class SahhaPlugin : Plugin() {
     @PluginMethod
     fun analyze(call: PluginCall) {
 
-        Sahha.analyze() { error, value ->
-            if (error != null) {
-                call.reject(error)
-            } else if (value != null) {
-                val data = JSObject()
-                data.put("value", value)
-                call.resolve(data)
-            } else {
-                call.reject("Sahha analyze is not available")
+        val startDate: Long? = call.getLong("startDate")
+        if (startDate != null) {
+            Log.d("Sahha", "startDate $startDate")
+        } else {
+            Log.d("Sahha", "startDate missing")
+        }
+
+        val endDate: Long? = call.getLong("endDate")
+        if (endDate != null) {
+            Log.d("Sahha", "endDate $endDate")
+        } else {
+            Log.d("Sahha", "endDate missing")
+        }
+
+        if (startDate != null && endDate != null) {
+            Sahha.analyze(Pair(Date(startDate), Date(endDate))) { error, value ->
+                if (error != null) {
+                    call.reject(error)
+                } else if (value != null) {
+                    val data = JSObject()
+                    data.put("value", value)
+                    call.resolve(data)
+                } else {
+                    call.reject("Sahha analyze is not available")
+                }
+            }
+        } else {
+            Sahha.analyze() { error, value ->
+                if (error != null) {
+                    call.reject(error)
+                } else if (value != null) {
+                    val data = JSObject()
+                    data.put("value", value)
+                    call.resolve(data)
+                } else {
+                    call.reject("Sahha analyze is not available")
+                }
             }
         }
     }
