@@ -190,7 +190,7 @@ public class SahhaPlugin: CAPPlugin {
     
     @objc func analyze(_ call: CAPPluginCall) {
         var dates: (startDate: Date, endDate: Date)?
-        if let startDateNumber = call.getInt("startDate"), let endDateNumber = call.getInt("endDate") {
+        if let startDateNumber = call.getDouble("startDate"), let endDateNumber = call.getDouble("endDate") {
             let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber / 1000))
             let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber / 1000))
             dates = (startDate, endDate)
