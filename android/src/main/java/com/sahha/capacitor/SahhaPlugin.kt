@@ -271,6 +271,12 @@ class SahhaPlugin : Plugin() {
             Log.d("Sahha", "endDate missing")
         }
 
+        var includeSourceData: Boolean = false
+        if (call.hasOption("includeSourceData")) {
+            includeSourceData = call.getBoolean("includeSourceData")
+        }
+        Log.d("Sahha", "includeSourceData " + includeSourceData.toString())
+
         if (startDate != null && endDate != null) {
             Sahha.analyze(Pair(Date(startDate), Date(endDate))) { error, value ->
                 if (error != null) {
