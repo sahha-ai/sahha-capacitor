@@ -108,6 +108,38 @@ public class SahhaPlugin: CAPPlugin {
                 sahhaDemographic.birthCountry = birthCountry
             }
             
+            if let ethnicity = demographic["ethnicity"] as? String {
+                sahhaDemographic.ethnicity = ethnicity
+            }
+
+            if let occupation = demographic["occupation"] as? String {
+                sahhaDemographic.occupation = occupation
+            }
+
+            if let industry = demographic["industry"] as? String {
+                sahhaDemographic.industry = industry
+            }
+
+            if let incomeRange = demographic["incomeRange"] as? String {
+                sahhaDemographic.incomeRange = incomeRange
+            }
+
+            if let education = demographic["education"] as? String {
+                sahhaDemographic.education = education
+            }
+
+            if let relationship = demographic["relationship"] as? String {
+                sahhaDemographic.relationship = relationship
+            }
+
+            if let locale = demographic["locale"] as? String {
+                sahhaDemographic.locale = locale
+            }
+
+            if let livingArrangement = demographic["livingArrangement"] as? String {
+                sahhaDemographic.livingArrangement = livingArrangement
+            }
+            
             Sahha.postDemographic(sahhaDemographic) { error, success in
                 if let error = error {
                     call.reject(error)
