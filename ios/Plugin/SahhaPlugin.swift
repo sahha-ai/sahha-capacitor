@@ -140,6 +140,10 @@ public class SahhaPlugin: CAPPlugin {
                 sahhaDemographic.livingArrangement = livingArrangement
             }
             
+            if let birthDate = demographic["birthDate"] as? String {
+                sahhaDemographic.birthDate = birthDate
+            }
+            
             Sahha.postDemographic(sahhaDemographic) { error, success in
                 if let error = error {
                     call.reject(error)
