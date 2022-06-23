@@ -146,8 +146,9 @@ class SahhaPlugin : Plugin() {
         val relationship: String? = demographic.getString("relationship")
         val locale: String? = demographic.getString("locale")
         val livingArrangement: String? = demographic.getString("livingArrangement")
+        val birthDate: String? = demographic.getString("birthDate")
 
-        var sahhaDemographic = SahhaDemographic(age, gender, country, birthCountry)
+        var sahhaDemographic = SahhaDemographic(age, gender, country, birthCountry, ethnicity, occupation, industry, incomeRange, education, relationship, locale, livingArrangement, birthDate)
         Log.d("Sahha", sahhaDemographic.toString())
 
         Sahha.postDemographic(sahhaDemographic) { error, success ->
