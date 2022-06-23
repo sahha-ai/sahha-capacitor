@@ -274,12 +274,12 @@ class SahhaPlugin : Plugin() {
 
         var includeSourceData: Boolean = false
         if (call.hasOption("includeSourceData")) {
-            includeSourceData = call.getBoolean("includeSourceData")
+            includeSourceData = call.getBoolean("includeSourceData") ?: false
         }
         Log.d("Sahha", "includeSourceData " + includeSourceData.toString())
 
         if (startDate != null && endDate != null) {
-            Sahha.analyze(Pair(Date(startDate), Date(endDate))) { error, value ->
+            Sahha.analyze(includeSourceData, Pair(Date(startDate), Date(endDate))) { error, value ->
                 if (error != null) {
                     call.reject(error)
                 } else if (value != null) {
@@ -291,7 +291,7 @@ class SahhaPlugin : Plugin() {
                 }
             }
         } else {
-            Sahha.analyze() { error, value ->
+            Sahha.analyze(includeSourceData) { error, value ->
                 if (error != null) {
                     call.reject(error)
                 } else if (value != null) {
