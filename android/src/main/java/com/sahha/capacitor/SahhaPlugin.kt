@@ -63,18 +63,46 @@ class SahhaPlugin : Plugin() {
             }
         }
 
+        // Notification config
+        var sahhaNotificationConfiguration: SahhaNotificationConfiguration? = null
+        try {
+            settings.getJSObject("notificationSettings")?.also { nSettings ->
+                val icon = nSettings.getString("icon")
+                val title = nSettings.getString("title")
+                val shortDescription = nSettings.getString("shortDescription")
+
+                sahhaNotificationConfiguration = SahhaNotificationConfiguration(
+                    SahhaConverterUtility.stringToDrawableResource(
+                        context,
+                        icon
+                    ),
+                    title,
+                    shortDescription,
+                )
+            }
+        } catch (e: IllegalArgumentException) {
+            call.reject("Sahha.configure() notification config is not valid")
+            return
+        }
+        // Notification config ends
+
         var postSensorDataManually: Boolean = settings.getBoolean("postSensorDataManually", false) ?: false
 
-        var sahhaSettings = SahhaSettings(sahhaEnvironment, SahhaFramework.capacitor, sahhaSensors, postSensorDataManually)
+        var sahhaSettings = SahhaSettings(sahhaEnvironment, sahhaNotificationConfiguration, SahhaFramework.capacitor, sahhaSensors, postSensorDataManually)
 
         var app = activity?.application
         if (app == null) {
             call.reject("Sahha configure app is missing")
         } else {
-            Sahha.configure(app, sahhaSettings)
-            val data = JSObject()
-            data.put("success", true)
-            call.resolve(data)
+            Sahha.configure(app, sahhaSettings) { error, success ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("success", success)
+                    call.resolve(data)
+                }
+            }
         }
     }
 
@@ -165,92 +193,43 @@ class SahhaPlugin : Plugin() {
     @PluginMethod
     fun getSensorStatus(call: PluginCall) {
 
-        var sensor: String? = call.getString("sensor")
-        if (sensor == null) {
-            call.reject("Sahha sensor parameter is missing")
-            return
-        }
-
-        try {
-            var sahhaSensor = SahhaSensor.valueOf(sensor)
-            Sahha.getSensorStatus(
-                context,
-                sahhaSensor
-            ) { error, sensorStatus ->
-                if (error != null) {
-                    call.reject(error)
-                } else {
-                    val data = JSObject()
-                    data.put("status", sensorStatus.ordinal)
-                    call.resolve(data)
-                }
+        Sahha.getSensorStatus(
+            context,
+        ) { error, sensorStatus ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val data = JSObject()
+                data.put("status", sensorStatus.ordinal)
+                call.resolve(data)
             }
-        } catch (e: IllegalArgumentException) {
-            call.reject("Sahha sensor parameter is not valid")
         }
     }
 
     @PluginMethod
-    fun enableSensor(call: PluginCall) {
+    fun enableSensors(call: PluginCall) {
 
-        var sensor: String? = call.getString("sensor")
-        if (sensor == null) {
-            call.reject("Sahha sensor parameter is missing")
-            return
-        }
-
-        try {
-            var sahhaSensor = SahhaSensor.valueOf(sensor)
-            Sahha.enableSensor(
-                context,
-                sahhaSensor
-            ) { error, sensorStatus ->
-                if (error != null) {
-                    call.reject(error)
-                } else {
-                    val data = JSObject()
-                    data.put("status", sensorStatus.ordinal)
-                    call.resolve(data)
-                }
+        Sahha.enableSensors(context) { error, sensorStatus ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val data = JSObject()
+                data.put("status", sensorStatus.ordinal)
+                call.resolve(data)
             }
-        } catch (e: IllegalArgumentException) {
-            call.reject("Sahha sensor parameter is not valid")
         }
     }
 
     @PluginMethod
     fun postSensorData(call: PluginCall) {
 
-        var sensors: JSArray? = call.getArray("sensors")
-        if (sensors == null) {
-            Sahha.postSensorData { error, success ->
-                if (error != null) {
-                    call.reject(error)
-                } else {
-                    val data = JSObject()
-                    data.put("success", success)
-                    call.resolve(data)
-                }
-            }
-        } else {
-            var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf<SahhaSensor>()
-            for (sensor in sensors.toList<String>()) {
-                try {
-                    var sahhaSensor = SahhaSensor.valueOf(sensor)
-                    sahhaSensors.add(sahhaSensor)
-                } catch (e: IllegalArgumentException) {
-                    call.reject("Sahha sensor parameter $sensor is not valid")
-                    return
-                }
-            }
-            Sahha.postSensorData(sahhaSensors) { error, success ->
-                if (error != null) {
-                    call.reject(error)
-                } else {
-                    val data = JSObject()
-                    data.put("success", success)
-                    call.resolve(data)
-                }
+        Sahha.postSensorData { error, success ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val data = JSObject()
+                data.put("success", success)
+                call.resolve(data)
             }
         }
     }
