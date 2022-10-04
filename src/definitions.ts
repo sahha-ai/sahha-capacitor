@@ -19,7 +19,12 @@ export enum SahhaSensorStatus {
 export interface SahhaSettings {
   environment: SahhaEnvironment,
   sensors?: SahhaSensor[],
-  postSensorDataManually?: boolean
+  postSensorDataManually?: boolean,
+  notificationSettings?: {
+    icon?: string,
+    title?: string,
+    shortDescription?: string,
+  },
 }
 
 export interface SahhaDemographic {
@@ -42,9 +47,9 @@ export interface SahhaPlugin {
   authenticate(options: { profileToken: string, refreshToken: string }): Promise<{ success: boolean }>;
   getDemographic(): Promise<{ value: string }>;
   postDemographic(options: { demographic: SahhaDemographic }): Promise<{ success: boolean }>;
-  getSensorStatus(options: { sensor: SahhaSensor }): Promise<{ status: SahhaSensorStatus }>;
-  enableSensor(options: { sensor: SahhaSensor }): Promise<{ status: SahhaSensorStatus }>;
-  postSensorData(options?: { sensors: [SahhaSensor] }): Promise<{ success: boolean }>;
+  getSensorStatus(): Promise<{ status: SahhaSensorStatus }>;
+  enableSensors(): Promise<{ status: SahhaSensorStatus }>;
+  postSensorData(): Promise<{ success: boolean }>;
   analyze(options?: {
     startDate?: number, endDate?: number, includeSourceData?: boolean
   }): Promise<{ value: string }>;

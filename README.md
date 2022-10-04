@@ -17,9 +17,9 @@ npx cap sync
 * [`authenticate(...)`](#authenticate)
 * [`getDemographic()`](#getdemographic)
 * [`postDemographic(...)`](#postdemographic)
-* [`getSensorStatus(...)`](#getsensorstatus)
-* [`enableSensor(...)`](#enablesensor)
-* [`postSensorData(...)`](#postsensordata)
+* [`getSensorStatus()`](#getsensorstatus)
+* [`enableSensors()`](#enablesensors)
+* [`postSensorData()`](#postsensordata)
 * [`analyze(...)`](#analyze)
 * [`openAppSettings()`](#openappsettings)
 * [Interfaces](#interfaces)
@@ -86,45 +86,33 @@ postDemographic(options: { demographic: SahhaDemographic; }) => Promise<{ succes
 --------------------
 
 
-### getSensorStatus(...)
+### getSensorStatus()
 
 ```typescript
-getSensorStatus(options: { sensor: SahhaSensor; }) => Promise<{ status: SahhaSensorStatus; }>
+getSensorStatus() => Promise<{ status: SahhaSensorStatus; }>
 ```
-
-| Param         | Type                                                             |
-| ------------- | ---------------------------------------------------------------- |
-| **`options`** | <code>{ sensor: <a href="#sahhasensor">SahhaSensor</a>; }</code> |
 
 **Returns:** <code>Promise&lt;{ status: <a href="#sahhasensorstatus">SahhaSensorStatus</a>; }&gt;</code>
 
 --------------------
 
 
-### enableSensor(...)
+### enableSensors()
 
 ```typescript
-enableSensor(options: { sensor: SahhaSensor; }) => Promise<{ status: SahhaSensorStatus; }>
+enableSensors() => Promise<{ status: SahhaSensorStatus; }>
 ```
-
-| Param         | Type                                                             |
-| ------------- | ---------------------------------------------------------------- |
-| **`options`** | <code>{ sensor: <a href="#sahhasensor">SahhaSensor</a>; }</code> |
 
 **Returns:** <code>Promise&lt;{ status: <a href="#sahhasensorstatus">SahhaSensorStatus</a>; }&gt;</code>
 
 --------------------
 
 
-### postSensorData(...)
+### postSensorData()
 
 ```typescript
-postSensorData(options?: { sensors: [SahhaSensor]; } | undefined) => Promise<{ success: boolean; }>
+postSensorData() => Promise<{ success: boolean; }>
 ```
-
-| Param         | Type                                     |
-| ------------- | ---------------------------------------- |
-| **`options`** | <code>{ sensors: [SahhaSensor]; }</code> |
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
@@ -134,12 +122,12 @@ postSensorData(options?: { sensors: [SahhaSensor]; } | undefined) => Promise<{ s
 ### analyze(...)
 
 ```typescript
-analyze(options?: { startDate: number; endDate: number; } | undefined) => Promise<{ value: string; }>
+analyze(options?: { startDate?: number | undefined; endDate?: number | undefined; includeSourceData?: boolean | undefined; } | undefined) => Promise<{ value: string; }>
 ```
 
-| Param         | Type                                                 |
-| ------------- | ---------------------------------------------------- |
-| **`options`** | <code>{ startDate: number; endDate: number; }</code> |
+| Param         | Type                                                                                |
+| ------------- | ----------------------------------------------------------------------------------- |
+| **`options`** | <code>{ startDate?: number; endDate?: number; includeSourceData?: boolean; }</code> |
 
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 
@@ -160,21 +148,30 @@ openAppSettings() => Promise<void>
 
 #### SahhaSettings
 
-| Prop                         | Type                                                          |
-| ---------------------------- | ------------------------------------------------------------- |
-| **`environment`**            | <code><a href="#sahhaenvironment">SahhaEnvironment</a></code> |
-| **`sensors`**                | <code>SahhaSensor[]</code>                                    |
-| **`postSensorDataManually`** | <code>boolean</code>                                          |
+| Prop                         | Type                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| **`environment`**            | <code><a href="#sahhaenvironment">SahhaEnvironment</a></code>              |
+| **`sensors`**                | <code>SahhaSensor[]</code>                                                 |
+| **`postSensorDataManually`** | <code>boolean</code>                                                       |
+| **`notificationSettings`**   | <code>{ icon?: string; title?: string; shortDescription?: string; }</code> |
 
 
 #### SahhaDemographic
 
-| Prop               | Type                |
-| ------------------ | ------------------- |
-| **`age`**          | <code>number</code> |
-| **`gender`**       | <code>string</code> |
-| **`country`**      | <code>string</code> |
-| **`birthCountry`** | <code>string</code> |
+| Prop                    | Type                |
+| ----------------------- | ------------------- |
+| **`age`**               | <code>number</code> |
+| **`gender`**            | <code>string</code> |
+| **`country`**           | <code>string</code> |
+| **`birthCountry`**      | <code>string</code> |
+| **`ethnicity`**         | <code>string</code> |
+| **`occupation`**        | <code>string</code> |
+| **`industry`**          | <code>string</code> |
+| **`incomeRange`**       | <code>string</code> |
+| **`education`**         | <code>string</code> |
+| **`relationship`**      | <code>string</code> |
+| **`locale`**            | <code>string</code> |
+| **`livingArrangement`** | <code>string</code> |
 
 
 ### Enums
