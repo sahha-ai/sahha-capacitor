@@ -26,14 +26,15 @@ public class SahhaPlugin: CAPPlugin {
                     sahhaSettings.postSensorDataManually = postSensorDataManually
                 }
 
-                Sahha.configure(sahhaSettings)
+                Sahha.configure(sahhaSettings) {
+                    call.resolve([
+                        "success": true
+                    ])
+                }
                 
                 // Needed for Ionic Capacitor since native iOS lifecycle is delayed at launch
                 Sahha.launch()
-                
-                call.resolve([
-                    "success": true
-                ])
+
             } else {
                 call.reject("Sahha settings environment parameter is missing")
             }
@@ -158,68 +159,32 @@ public class SahhaPlugin: CAPPlugin {
     }
     
     @objc func getSensorStatus(_ call: CAPPluginCall) {
-        if let sensor = call.getString("sensor"), let sahhaSensor = SahhaSensor(rawValue: sensor) {
-            Sahha.getSensorStatus(sahhaSensor) { sensorStatus in
-                call.resolve([
-                    "status": sensorStatus.rawValue
-                    ]
-                )
-            }
-        } else {
-            call.reject("Sahha sensor parameter is not valid")
+        Sahha.getSensorStatus { sensorStatus in
+            call.resolve([
+                "status": sensorStatus.rawValue
+            ]
+            )
         }
     }
     
-    @objc func enableSensor(_ call: CAPPluginCall) {
-        if let sensor = call.getString("sensor"), let sahhaSensor = SahhaSensor(rawValue: sensor) {
-            Sahha.enableSensor(sahhaSensor) { sensorStatus in
-                call.resolve([
-                    "status": sensorStatus.rawValue
-                    ]
-                )
-            }
-        } else {
-            call.reject("Sahha sensor parameter is not valid")
+    @objc func enableSensors(_ call: CAPPluginCall) {
+        Sahha.enableSensors { sensorStatus in
+            call.resolve([
+                "status": sensorStatus.rawValue
+            ]
+            )
         }
     }
     
     @objc func postSensorData(_ call: CAPPluginCall) {
-        if let sensors = call.getArray("sensors") as? [String]
-        {
-            var sahhaSensors: Set<SahhaSensor> = []
-            for sensor in sensors {
-                if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-                    sahhaSensors.insert(sahhaSensor)
-                } else {
-                    call.reject("Sahha sensor parameter \(sensor) is not valid")
-                    return
-                }
-            }
-            if sahhaSensors.isEmpty {
-                call.reject("Sahha sensors parameter is empty")
-                return
+        Sahha.postSensorData { error, success in
+            if let error = error {
+                call.reject(error)
             } else {
-                Sahha.postSensorData(sahhaSensors) { error, success in
-                    if let error = error {
-                        call.reject(error)
-                    } else {
-                        call.resolve([
-                            "success": success
-                        ]
-                        )
-                    }
-                }
-            }
-        } else {
-            Sahha.postSensorData() { error, success in
-                if let error = error {
-                    call.reject(error)
-                } else {
-                    call.resolve([
-                        "success": success
-                    ]
-                    )
-                }
+                call.resolve([
+                    "success": success
+                ]
+                )
             }
         }
     }
