@@ -31,9 +31,6 @@ public class SahhaPlugin: CAPPlugin {
                         "success": true
                     ])
                 }
-                
-                // Needed for Ionic Capacitor since native iOS lifecycle is delayed at launch
-                Sahha.launch()
 
             } else {
                 call.reject("Sahha settings environment parameter is missing")
