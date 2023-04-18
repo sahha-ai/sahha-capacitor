@@ -7,6 +7,8 @@ export enum SahhaSensor {
   sleep = 'sleep',
   pedometer = 'pedometer',
   device = 'device',
+  heart = 'heart',
+  blood = 'blood',
 }
 
 export enum SahhaSensorStatus {
@@ -19,7 +21,6 @@ export enum SahhaSensorStatus {
 export interface SahhaSettings {
   environment: SahhaEnvironment,
   sensors?: SahhaSensor[],
-  postSensorDataManually?: boolean,
   notificationSettings?: {
     icon?: string,
     title?: string,
@@ -44,7 +45,7 @@ export interface SahhaDemographic {
 
 export interface SahhaPlugin {
   configure(options: { settings: SahhaSettings }): Promise<{ success: boolean }>;
-  authenticate(options: { profileToken: string, refreshToken: string }): Promise<{ success: boolean }>;
+  authenticate(options: { appId: string, appSecret: string, externalId: string }): Promise<{ success: boolean }>;
   getDemographic(): Promise<{ value: string }>;
   postDemographic(options: { demographic: SahhaDemographic }): Promise<{ success: boolean }>;
   getSensorStatus(): Promise<{ status: SahhaSensorStatus }>;

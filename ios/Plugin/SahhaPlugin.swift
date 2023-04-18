@@ -22,9 +22,6 @@ public class SahhaPlugin: CAPPlugin {
                     }
                     sahhaSettings.sensors = sahhaSensors
                 }
-                if let postSensorDataManually = settings["postSensorDataManually"] as? Bool {
-                    sahhaSettings.postSensorDataManually = postSensorDataManually
-                }
 
                 Sahha.configure(sahhaSettings) {
                     call.resolve([
@@ -41,22 +38,28 @@ public class SahhaPlugin: CAPPlugin {
     }
     
     @objc func authenticate(_ call: CAPPluginCall) {
-        guard let profileToken = call.getString("profileToken") else {
-            call.reject("Sahha authenticate profileToken parameter is missing")
+        guard let appId = call.getString("appId") else {
+            call.reject("Sahha authenticate appId parameter is missing")
             return
         }
-        guard let refreshToken = call.getString("refreshToken") else {
-            call.reject("Sahha authenticate refreshToken parameter is missing")
+        guard let appSecret = call.getString("appSecret") else {
+            call.reject("Sahha authenticate appSecret parameter is missing")
+            return
+        }
+        guard let externalId = call.getString("externalId") else {
+            call.reject("Sahha authenticate externalId parameter is missing")
             return
         }
         
-        let success = Sahha.authenticate(profileToken: profileToken, refreshToken: refreshToken)
-        if success {
-            call.resolve([
-                "success": true
-            ])
-        } else {
-            call.reject("Sahha authenticate was not successful")
+        Sahha.authenticate(appId: appId, appSecret: appSecret, externalId: externalId) { error, success in
+            
+            if let error = error {
+                call.reject(error)
+            } else {
+                call.resolve([
+                    "success": success
+                ])
+            }
         }
     }
     
