@@ -86,9 +86,7 @@ class SahhaPlugin : Plugin() {
         }
         // Notification config ends
 
-        var postSensorDataManually: Boolean = settings.getBoolean("postSensorDataManually", false) ?: false
-
-        var sahhaSettings = SahhaSettings(sahhaEnvironment, sahhaNotificationConfiguration, SahhaFramework.capacitor, sahhaSensors, postSensorDataManually)
+        var sahhaSettings = SahhaSettings(sahhaEnvironment, sahhaNotificationConfiguration, SahhaFramework.capacitor, sahhaSensors)
 
         var app = activity?.application
         if (app == null) {
@@ -109,19 +107,25 @@ class SahhaPlugin : Plugin() {
     @PluginMethod
     fun authenticate(call: PluginCall) {
 
-        var profileToken: String? = call.getString("profileToken");
-        if (profileToken == null) {
-            call.reject("Sahha authenticate profileToken parameter is missing")
+        var appId: String? = call.getString("appId");
+        if (appId == null) {
+            call.reject("Sahha authenticate appId parameter is missing")
             return
         }
 
-        var refreshToken: String? = call.getString("refreshToken");
-        if (refreshToken == null) {
-            call.reject("Sahha authenticate refreshToken parameter is missing")
+        var appSecret: String? = call.getString("appSecret");
+        if (appSecret == null) {
+            call.reject("Sahha authenticate appSecret parameter is missing")
             return
         }
 
-        Sahha.authenticate(profileToken, refreshToken)
+        var externalId: String? = call.getString("externalId");
+        if (externalId == null) {
+            call.reject("Sahha authenticate externalId parameter is missing")
+            return
+        }
+
+        Sahha.authenticate(appId, appSecret, externalId)
         { error, success ->
             if (error != null) {
                 call.reject(error);
