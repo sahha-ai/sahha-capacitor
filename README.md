@@ -48,12 +48,12 @@ configure(options: { settings: SahhaSettings; }) => Promise<{ success: boolean; 
 ### authenticate(...)
 
 ```typescript
-authenticate(options: { profileToken: string; refreshToken: string; }) => Promise<{ success: boolean; }>
+authenticate(options: { appId: string; appSecret: string; externalId: string; }) => Promise<{ success: boolean; }>
 ```
 
-| Param         | Type                                                         |
-| ------------- | ------------------------------------------------------------ |
-| **`options`** | <code>{ profileToken: string; refreshToken: string; }</code> |
+| Param         | Type                                                                   |
+| ------------- | ---------------------------------------------------------------------- |
+| **`options`** | <code>{ appId: string; appSecret: string; externalId: string; }</code> |
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
@@ -148,12 +148,11 @@ openAppSettings() => Promise<void>
 
 #### SahhaSettings
 
-| Prop                         | Type                                                                       |
-| ---------------------------- | -------------------------------------------------------------------------- |
-| **`environment`**            | <code><a href="#sahhaenvironment">SahhaEnvironment</a></code>              |
-| **`sensors`**                | <code>SahhaSensor[]</code>                                                 |
-| **`postSensorDataManually`** | <code>boolean</code>                                                       |
-| **`notificationSettings`**   | <code>{ icon?: string; title?: string; shortDescription?: string; }</code> |
+| Prop                       | Type                                                                       |
+| -------------------------- | -------------------------------------------------------------------------- |
+| **`environment`**          | <code><a href="#sahhaenvironment">SahhaEnvironment</a></code>              |
+| **`sensors`**              | <code>SahhaSensor[]</code>                                                 |
+| **`notificationSettings`** | <code>{ icon?: string; title?: string; shortDescription?: string; }</code> |
 
 
 #### SahhaDemographic
@@ -192,6 +191,8 @@ openAppSettings() => Promise<void>
 | **`sleep`**     | <code>'sleep'</code>     |
 | **`pedometer`** | <code>'pedometer'</code> |
 | **`device`**    | <code>'device'</code>    |
+| **`heart`**     | <code>'heart'</code>     |
+| **`blood`**     | <code>'blood'</code>     |
 
 
 #### SahhaSensorStatus
