@@ -72,5 +72,5 @@ dependencies {
         }
     }
     implementation "com.google.code.gson:gson:2.9.0"
-    implementation "com.github.sahha-ai:sahha-android:0.14.0"
+    implementation "com.github.sahha-ai:sahha-android:0.14.5"
 }
