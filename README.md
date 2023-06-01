@@ -122,12 +122,12 @@ postSensorData() => Promise<{ success: boolean; }>
 ### analyze(...)
 
 ```typescript
-analyze(options?: { startDate?: number | undefined; endDate?: number | undefined; includeSourceData?: boolean | undefined; } | undefined) => Promise<{ value: string; }>
+analyze(options?: { startDate?: number | undefined; endDate?: number | undefined; } | undefined) => Promise<{ value: string; }>
 ```
 
-| Param         | Type                                                                                |
-| ------------- | ----------------------------------------------------------------------------------- |
-| **`options`** | <code>{ startDate?: number; endDate?: number; includeSourceData?: boolean; }</code> |
+| Param         | Type                                                   |
+| ------------- | ------------------------------------------------------ |
+| **`options`** | <code>{ startDate?: number; endDate?: number; }</code> |
 
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 

@@ -25,7 +25,7 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 30
     defaultConfig {
-        minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 21
+        minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 26
         targetSdkVersion project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 30
         versionCode 1
         versionName "1.0"
@@ -72,5 +72,5 @@ dependencies {
         }
     }
     implementation "com.google.code.gson:gson:2.9.0"
-    implementation "com.github.sahha-ai:sahha-android:0.14.0"
+    implementation "com.github.sahha-ai:sahha-android:0.14.5"
 }

@@ -19,40 +19,49 @@ export enum SahhaSensorStatus {
 }
 
 export interface SahhaSettings {
-  environment: SahhaEnvironment,
-  sensors?: SahhaSensor[],
+  environment: SahhaEnvironment;
+  sensors?: SahhaSensor[];
   notificationSettings?: {
-    icon?: string,
-    title?: string,
-    shortDescription?: string,
-  },
+    icon?: string;
+    title?: string;
+    shortDescription?: string;
+  };
 }
 
 export interface SahhaDemographic {
-  age?: number,
-  gender?: string,
-  country?: string,
-  birthCountry?: string,
-  ethnicity?: string,
-  occupation?: string,
-  industry?: string,
-  incomeRange?: string,
-  education?: string,
-  relationship?: string,
-  locale?: string,
-  livingArrangement?: string
+  age?: number;
+  gender?: string;
+  country?: string;
+  birthCountry?: string;
+  ethnicity?: string;
+  occupation?: string;
+  industry?: string;
+  incomeRange?: string;
+  education?: string;
+  relationship?: string;
+  locale?: string;
+  livingArrangement?: string;
 }
 
 export interface SahhaPlugin {
-  configure(options: { settings: SahhaSettings }): Promise<{ success: boolean }>;
-  authenticate(options: { appId: string, appSecret: string, externalId: string }): Promise<{ success: boolean }>;
+  configure(options: {
+    settings: SahhaSettings;
+  }): Promise<{ success: boolean }>;
+  authenticate(options: {
+    appId: string;
+    appSecret: string;
+    externalId: string;
+  }): Promise<{ success: boolean }>;
   getDemographic(): Promise<{ value: string }>;
-  postDemographic(options: { demographic: SahhaDemographic }): Promise<{ success: boolean }>;
+  postDemographic(options: {
+    demographic: SahhaDemographic;
+  }): Promise<{ success: boolean }>;
   getSensorStatus(): Promise<{ status: SahhaSensorStatus }>;
   enableSensors(): Promise<{ status: SahhaSensorStatus }>;
   postSensorData(): Promise<{ success: boolean }>;
   analyze(options?: {
-    startDate?: number, endDate?: number, includeSourceData?: boolean
+    startDate?: number;
+    endDate?: number;
   }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
 }

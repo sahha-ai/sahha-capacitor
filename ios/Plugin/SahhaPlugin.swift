@@ -191,7 +191,6 @@ public class SahhaPlugin: CAPPlugin {
     
     @objc func analyze(_ call: CAPPluginCall) {
         var dates: (startDate: Date, endDate: Date)?
-        var includeSourceData: Bool = false
         if let startDateNumber = call.getDouble("startDate"), let endDateNumber = call.getDouble("endDate") {
             let startDate = Date(timeIntervalSince1970: TimeInterval(startDateNumber / 1000))
             let endDate = Date(timeIntervalSince1970: TimeInterval(endDateNumber / 1000))
@@ -201,12 +200,8 @@ public class SahhaPlugin: CAPPlugin {
         } else {
             print("no dates")
         }
-        if let boolValue = call.getBool("includeSourceData") {
-            includeSourceData = boolValue
-            print("includeSourceData", includeSourceData)
-        }
         
-        Sahha.analyze(dates: dates, includeSourceData: includeSourceData) { error, value in
+        Sahha.analyze(dates: dates) { error, value in
             if let error = error {
                 call.reject(error)
             } else if let value = value {
