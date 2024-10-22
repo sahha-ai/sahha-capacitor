@@ -1,4 +1,4 @@
-package com.example.plugin;
+package demo.sahha.capacitor;
 
 import com.getcapacitor.BridgeActivity;
 

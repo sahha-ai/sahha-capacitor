@@ -1,6 +1,6 @@
 {
-  "appId": "com.example.plugin",
-  "appName": "example-app",
+  "appId": "demo.sahha.capacitor",
+  "appName": "Sahha Demo",
   "webDir": "dist",
   "plugins": {
     "SplashScreen": {
