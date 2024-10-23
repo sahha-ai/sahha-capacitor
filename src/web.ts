@@ -63,14 +63,14 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
   }
 
   async getSensorStatus(options: {
-    sensors: Array<SahhaSensor>;
+    sensors: SahhaSensor[];
   }): Promise<{ status: SahhaSensorStatus }> {
     console.log("getSensorStatus", options)
     return { status: 0}
   }
 
   async enableSensors(options: {
-    sensors: Array<SahhaSensor>;
+    sensors: SahhaSensor[];
   }): Promise<{ status: SahhaSensorStatus }> {
     console.log("enableSensors", options)
     return { status: 2}

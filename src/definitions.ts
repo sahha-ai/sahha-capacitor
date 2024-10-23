@@ -106,10 +106,10 @@ export interface SahhaPlugin {
     demographic: SahhaDemographic;
   }): Promise<{ success: boolean }>;
   getSensorStatus(options: {
-    sensors: Array<SahhaSensor>;
+    sensors: SahhaSensor[];
   }): Promise<{ status: SahhaSensorStatus }>;
   enableSensors(options: {
-    sensors: Array<SahhaSensor>;
+    sensors: SahhaSensor[];
   }): Promise<{ status: SahhaSensorStatus }>;
   openAppSettings(): Promise<void>;
 }
