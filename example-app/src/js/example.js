@@ -7,6 +7,8 @@ window.setup = () => {
     document.getElementById("externalId").value = localStorage.externalId ?? "";
     document.getElementById("gender").value = localStorage.gender ?? "";
     document.getElementById("age").value = localStorage.age ?? "";
+    document.getElementById("inputMessage").value = localStorage.inputMessage ?? "";
+    document.getElementById("outputMessage").value = localStorage.outputMessage ?? "";
 
     configure();
 }
@@ -119,6 +121,19 @@ window.enableSensors = () => {
 
 window.openAppSettings = () => {
     Sahha.openAppSettings()
+}
+
+window.echo = () => {
+    const inputMessage = document.getElementById("inputMessage").value;
+    localStorage.setItem("inputMessage", inputMessage);
+
+    Sahha.echo({ value: inputMessage }).then(
+        function(response) {
+            console.log(response);
+            localStorage.setItem("outputMessage", response.value);
+            document.getElementById("outputMessage").value = response.value;
+        }
+    );
 }
 
 setup();

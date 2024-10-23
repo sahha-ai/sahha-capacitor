@@ -304,4 +304,11 @@ public class SahhaPlugin : Plugin() {
     fun openAppSettings(call: PluginCall) {
         Sahha.openAppSettings(context)
     }
+
+    @PluginMethod
+    fun echo(call: PluginCall) {
+        val data = JSObject()
+        data.put("value", call.getString("value"))
+        call.resolve(data)
+    }
 }

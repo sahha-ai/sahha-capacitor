@@ -24,6 +24,7 @@ npx cap sync
 * [`getSensorStatus(...)`](#getsensorstatus)
 * [`enableSensors(...)`](#enablesensors)
 * [`openAppSettings()`](#openappsettings)
+* [`echo(...)`](#echo)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -171,6 +172,21 @@ enableSensors(options: { sensors: SahhaSensor[]; }) => Promise<{ status: SahhaSe
 ```typescript
 openAppSettings() => Promise<void>
 ```
+
+--------------------
+
+
+### echo(...)
+
+```typescript
+echo(options: { value: string; }) => Promise<{ value: string; }>
+```
+
+| Param         | Type                            |
+| ------------- | ------------------------------- |
+| **`options`** | <code>{ value: string; }</code> |
+
+**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 
 --------------------
 
