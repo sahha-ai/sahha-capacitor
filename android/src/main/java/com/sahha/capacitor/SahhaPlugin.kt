@@ -7,7 +7,6 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import sdk.sahha.android.source.Sahha
 import sdk.sahha.android.source.SahhaConverterUtility
@@ -20,7 +19,7 @@ import sdk.sahha.android.source.SahhaSettings
 
 
 @CapacitorPlugin(name = "Sahha")
-public class SahhaPlugin: Plugin() {
+public class SahhaPlugin : Plugin() {
 
     @PluginMethod
     fun configure(call: PluginCall) {
@@ -69,7 +68,11 @@ public class SahhaPlugin: Plugin() {
         }
         // Notification config ends
 
-        var sahhaSettings = SahhaSettings(sahhaEnvironment, sahhaNotificationConfiguration, SahhaFramework.capacitor)
+        var sahhaSettings = SahhaSettings(
+            sahhaEnvironment,
+            sahhaNotificationConfiguration,
+            SahhaFramework.capacitor
+        )
 
         var app = activity?.application
         if (app == null) {
@@ -179,7 +182,7 @@ public class SahhaPlugin: Plugin() {
     @PluginMethod
     fun postDemographic(call: PluginCall) {
 
-        var demographic:JSObject? = call.getObject("demographic")
+        var demographic: JSObject? = call.getObject("demographic")
 
         if (demographic == null) {
             call.reject("Sahha demographic parameter is missing")
@@ -200,7 +203,21 @@ public class SahhaPlugin: Plugin() {
         val livingArrangement: String? = demographic.optString("livingArrangement")
         val birthDate: String? = demographic.optString("birthDate")
 
-        var sahhaDemographic = SahhaDemographic(age, gender, country, birthCountry, ethnicity, occupation, industry, incomeRange, education, relationship, locale, livingArrangement, birthDate)
+        var sahhaDemographic = SahhaDemographic(
+            age = if (age == 0) null else age,
+            gender = gender?.ifEmpty { null },
+            country = country?.ifEmpty { null },
+            birthCountry = birthCountry?.ifEmpty { null },
+            ethnicity = ethnicity?.ifEmpty { null },
+            occupation = occupation?.ifEmpty { null },
+            industry = industry?.ifEmpty { null },
+            incomeRange = incomeRange?.ifEmpty { null },
+            education = education?.ifEmpty { null },
+            relationship = relationship?.ifEmpty { null },
+            locale = locale?.ifEmpty { null },
+            livingArrangement = livingArrangement?.ifEmpty { null },
+            birthDate = birthDate?.ifEmpty { null },
+        )
         Log.d("Sahha", sahhaDemographic.toString())
 
         Sahha.postDemographic(sahhaDemographic) { error, success ->
@@ -217,7 +234,7 @@ public class SahhaPlugin: Plugin() {
     @PluginMethod
     fun getSensorStatus(call: PluginCall) {
 
-        var sensors:JSArray? = call.getArray("sensors")
+        var sensors: JSArray? = call.getArray("sensors")
 
         if (sensors == null) {
             call.reject("Sahha getSensorStatus sensors parameter is missing")
@@ -253,7 +270,7 @@ public class SahhaPlugin: Plugin() {
     @PluginMethod
     fun enableSensors(call: PluginCall) {
 
-        var sensors:JSArray? = call.getArray("sensors")
+        var sensors: JSArray? = call.getArray("sensors")
 
         if (sensors == null) {
             call.reject("Sahha enableSensors sensors parameter is missing")
