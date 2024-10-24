@@ -3,11 +3,6 @@ import { WebPlugin } from '@capacitor/core';
 import type { SahhaPlugin, SahhaSettings, SahhaDemographic, SahhaSensor, SahhaSensorStatus } from './definitions';
 
 export class SahhaWeb extends WebPlugin implements SahhaPlugin {
-  
-  async echo(options: { value: string }): Promise<{value: string}> {
-    console.log("echo", options);
-    return options;
-  }
 
   async configure(options: {
     settings: SahhaSettings
