@@ -46,7 +46,7 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
 
   async getDemographic(): Promise<{ demographic?: string }> {
     console.log("getDemographic")
-    return { demographic: `{ "gender" : "male", "age" : 40 }`
+    return { demographic: `{ "gender" : "Male", "age" : 40 }`
     }
   }
 

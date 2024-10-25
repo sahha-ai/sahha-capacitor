@@ -82,8 +82,14 @@ window.getDemographic = () => {
         function(response) {
             console.log(response);
             const json = JSON.parse(response.demographic);
-            document.getElementById("gender").value = json.gender ?? "gender diverse"
-            document.getElementById("age").value = json.age.toString() ?? "25"
+            if (json.gender) {
+                document.getElementById("gender").value = json.gender;
+                localStorage.setItem("gender", json.gender);
+            }
+            if (json.age) {
+                document.getElementById("age").value = json.age.toString();
+                localStorage.setItem("age", json.age.toString());
+            }
         },
         function(error) {
             console.log(error);
