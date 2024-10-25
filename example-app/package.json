@@ -1,7 +1,7 @@
 {
   "name": "sahha-demo-capacitor",
   "version": "1.0.0",
-  "description": "An Amazing Capacitor App",
+  "description": "Sahha Demo App",
   "type": "module",
   "keywords": [
     "capacitor",
