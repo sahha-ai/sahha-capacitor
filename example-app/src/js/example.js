@@ -1,4 +1,5 @@
 import { Sahha, SahhaEnvironment, SahhaSensor, SahhaSensorStatus } from 'sahha-capacitor';
+import { SahhaScoreType } from '../../../dist/esm/definitions';
 
 window.setup = () => {
 
@@ -116,6 +117,18 @@ window.enableSensors = () => {
         function(response) {
             console.log(response);
             document.getElementById("isSensorsEnabled").value = SahhaSensorStatus[response.status];
+        },
+        function(error) {
+            console.log(error);
+        }
+    )
+}
+
+window.getScores = () => {
+    Sahha.getScores({ types: [SahhaScoreType.activity] }).then(
+        function(response) {
+            console.log(response);
+            document.getElementById("scoreText").value = response.value;
         },
         function(error) {
             console.log(error);

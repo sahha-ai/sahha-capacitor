@@ -43,6 +43,7 @@ npx cap sync
 * [`postDemographic(...)`](#postdemographic)
 * [`getSensorStatus(...)`](#getsensorstatus)
 * [`enableSensors(...)`](#enablesensors)
+* [`getScores(...)`](#getscores)
 * [`openAppSettings()`](#openappsettings)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
@@ -186,6 +187,21 @@ enableSensors(options: { sensors: SahhaSensor[]; }) => Promise<{ status: SahhaSe
 --------------------
 
 
+### getScores(...)
+
+```typescript
+getScores(options: { types: SahhaScoreType[]; }) => Promise<{ value: string; }>
+```
+
+| Param         | Type                                      |
+| ------------- | ----------------------------------------- |
+| **`options`** | <code>{ types: SahhaScoreType[]; }</code> |
+
+**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+
+--------------------
+
+
 ### openAppSettings()
 
 ```typescript
@@ -289,6 +305,17 @@ openAppSettings() => Promise<void>
 | **`unavailable`** | <code>1</code> |
 | **`disabled`**    | <code>2</code> |
 | **`enabled`**     | <code>3</code> |
+
+
+#### SahhaScoreType
+
+| Members                | Value                           |
+| ---------------------- | ------------------------------- |
+| **`wellbeing`**        | <code>'wellbeing'</code>        |
+| **`activity`**         | <code>'activity'</code>         |
+| **`sleep`**            | <code>'sleep'</code>            |
+| **`readiness`**        | <code>'readiness'</code>        |
+| **`mental_wellbeing`** | <code>'mental_wellbeing'</code> |
 
 </docgen-api>
 

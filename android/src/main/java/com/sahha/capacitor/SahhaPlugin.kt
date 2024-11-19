@@ -14,6 +14,7 @@ import sdk.sahha.android.source.SahhaDemographic
 import sdk.sahha.android.source.SahhaEnvironment
 import sdk.sahha.android.source.SahhaFramework
 import sdk.sahha.android.source.SahhaNotificationConfiguration
+import sdk.sahha.android.source.SahhaScoreType
 import sdk.sahha.android.source.SahhaSensor
 import sdk.sahha.android.source.SahhaSettings
 
@@ -295,6 +296,38 @@ public class SahhaPlugin : Plugin() {
             } else {
                 val data = JSObject()
                 data.put("status", sensorStatus.ordinal)
+                call.resolve(data)
+            }
+        }
+    }
+
+    @PluginMethod
+    fun getScores(call: PluginCall) {
+        val types: JSArray? = call.getArray("types")
+
+        if (types == null) {
+            call.reject("Sahha getScores types parameter is missing")
+            return
+        }
+
+        val sahhaScoreTypes: MutableSet<SahhaScoreType> = mutableSetOf<SahhaScoreType>()
+        try {
+            for (i in 0 until types.length()) {
+                val type: String = types.getString(i)
+                val scoreType = SahhaScoreType.valueOf(type)
+                sahhaScoreTypes.add(scoreType)
+            }
+        } catch (e: IllegalArgumentException) {
+            call.reject("Sahha score type parameter is not valid")
+            return
+        }
+
+        Sahha.getScores(sahhaScoreTypes) { error, value ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val data = JSObject()
+                data.put("value", value)
                 call.resolve(data)
             }
         }
