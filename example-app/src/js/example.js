@@ -18,12 +18,12 @@ window.configure = () => {
             environment: SahhaEnvironment.sandbox
         }
     }).then(
-        function(response) {
+        function (response) {
             console.log(response);
             isAuthenticated();
             getSensorStatus();
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
@@ -31,11 +31,11 @@ window.configure = () => {
 
 window.isAuthenticated = () => {
     Sahha.isAuthenticated().then(
-        function(response) {
+        function (response) {
             console.log(response);
             document.getElementById("isAuthenticated").value = response.success;
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
@@ -48,12 +48,12 @@ window.authenticate = () => {
     localStorage.setItem("appId", appId);
     localStorage.setItem("appSecret", appSecret);
     localStorage.setItem("externalId", externalId);
-    Sahha.authenticate({appId, appSecret, externalId}).then(
-        function(response) {
+    Sahha.authenticate({ appId, appSecret, externalId }).then(
+        function (response) {
             console.log(response);
             document.getElementById("isAuthenticated").value = response.success;
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
@@ -68,11 +68,12 @@ window.postDemographic = () => {
         demographic: {
             gender: gender !== "" ? gender : null,
             age: age !== "" ? age : null
-        }}).then(
-        function(response) {
+        }
+    }).then(
+        function (response) {
             console.log(response);
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
@@ -80,7 +81,7 @@ window.postDemographic = () => {
 
 window.getDemographic = () => {
     Sahha.getDemographic().then(
-        function(response) {
+        function (response) {
             console.log(response);
             const json = JSON.parse(response.demographic);
             if (json.gender) {
@@ -92,7 +93,7 @@ window.getDemographic = () => {
                 localStorage.setItem("age", json.age.toString());
             }
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
@@ -102,11 +103,11 @@ let sensors = [SahhaSensor.sleep, SahhaSensor.step_count, SahhaSensor.floor_coun
 
 window.getSensorStatus = () => {
     Sahha.getSensorStatus({ sensors: sensors }).then(
-        function(response) {
+        function (response) {
             console.log(response);
             document.getElementById("isSensorsEnabled").value = SahhaSensorStatus[response.status];
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
@@ -114,23 +115,24 @@ window.getSensorStatus = () => {
 
 window.enableSensors = () => {
     Sahha.enableSensors({ sensors: sensors }).then(
-        function(response) {
+        function (response) {
             console.log(response);
             document.getElementById("isSensorsEnabled").value = SahhaSensorStatus[response.status];
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
 }
 
+let scoreTypes = [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.readiness, SahhaScoreType.wellbeing, SahhaScoreType.mental_wellbeing];
 window.getScores = () => {
-    Sahha.getScores({ types: [SahhaScoreType.activity] }).then(
-        function(response) {
+    Sahha.getScores({ types: scoreTypes }).then(
+        function (response) {
             console.log(response);
-            document.getElementById("scoreText").value = response.value;
+            document.getElementById("scoreText").innerText = response.value;
         },
-        function(error) {
+        function (error) {
             console.log(error);
         }
     )
