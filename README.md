@@ -190,12 +190,12 @@ enableSensors(options: { sensors: SahhaSensor[]; }) => Promise<{ status: SahhaSe
 ### getScores(...)
 
 ```typescript
-getScores(options: { types: SahhaScoreType[]; }) => Promise<{ value: string; }>
+getScores(options: { types: SahhaScoreType[]; startDate?: number; endDate?: number; }) => Promise<{ value: string; }>
 ```
 
-| Param         | Type                                      |
-| ------------- | ----------------------------------------- |
-| **`options`** | <code>{ types: SahhaScoreType[]; }</code> |
+| Param         | Type                                                                            |
+| ------------- | ------------------------------------------------------------------------------- |
+| **`options`** | <code>{ types: SahhaScoreType[]; startDate?: number; endDate?: number; }</code> |
 
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 

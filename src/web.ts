@@ -60,8 +60,14 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     return { status: 2 };
   }
 
-  async getScores(options: { types: SahhaScoreType[] }): Promise<{ value: string }> {
+  async getScores(options: {
+    types: SahhaScoreType[];
+    startDate?: number;
+    endDate?: number;
+  }): Promise<{ value: string }> {
     console.log('getScores', options);
+    console.log('startDate', options.startDate);
+    console.log('endDate', options.endDate);
     return { value: 'PLACEHOLDER' };
   }
 

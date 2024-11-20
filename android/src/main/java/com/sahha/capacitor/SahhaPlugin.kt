@@ -17,6 +17,9 @@ import sdk.sahha.android.source.SahhaNotificationConfiguration
 import sdk.sahha.android.source.SahhaScoreType
 import sdk.sahha.android.source.SahhaSensor
 import sdk.sahha.android.source.SahhaSettings
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 
 @CapacitorPlugin(name = "Sahha")
@@ -304,6 +307,10 @@ public class SahhaPlugin : Plugin() {
     @PluginMethod
     fun getScores(call: PluginCall) {
         val types: JSArray? = call.getArray("types")
+        val startDateEpochMilli: Long? = call.getLong("startDate")
+        println("startDate provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDate")
+        println("endDate provided: $endDateEpochMilli")
 
         if (types == null) {
             call.reject("Sahha getScores types parameter is missing")
@@ -322,13 +329,37 @@ public class SahhaPlugin : Plugin() {
             return
         }
 
-        Sahha.getScores(sahhaScoreTypes) { error, value ->
-            if (error != null) {
-                call.reject(error)
-            } else {
-                val data = JSObject()
-                data.put("value", value)
-                call.resolve(data)
+        val startDateIsNotNull = startDateEpochMilli != null
+        val endDateIsNotNull = endDateEpochMilli != null
+
+        if (startDateIsNotNull && endDateIsNotNull) {
+            val defaultZoneId = ZoneId.systemDefault()
+            val startInstant = Instant.ofEpochMilli(startDateEpochMilli!!)
+            val startLocalDateTime = LocalDateTime.ofInstant(startInstant, defaultZoneId)
+            val endInstant = Instant.ofEpochMilli(endDateEpochMilli!!)
+            val endLocalDateTime = LocalDateTime.ofInstant(endInstant, defaultZoneId)
+
+            Sahha.getScores(
+                sahhaScoreTypes,
+                Pair(startLocalDateTime, endLocalDateTime)
+            ) { error, value ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("value", value)
+                    call.resolve(data)
+                }
+            }
+        } else {
+            Sahha.getScores(sahhaScoreTypes) { error, value ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("value", value)
+                    call.resolve(data)
+                }
             }
         }
     }

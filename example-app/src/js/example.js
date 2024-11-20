@@ -125,9 +125,16 @@ window.enableSensors = () => {
     )
 }
 
-let scoreTypes = [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.readiness, SahhaScoreType.wellbeing, SahhaScoreType.mental_wellbeing];
 window.getScores = () => {
-    Sahha.getScores({ types: scoreTypes }).then(
+    const scoreTypes = [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.readiness, SahhaScoreType.wellbeing, SahhaScoreType.mental_wellbeing];
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
+    console.log('startDateJS ' + startDateEpochMilli);
+    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
+    console.log('endDateJS ' + endDateEpochMilli);
+
+    Sahha.getScores({ types: scoreTypes, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
         function (response) {
             console.log(response);
             document.getElementById("scoreText").innerText = response.value;
@@ -137,6 +144,15 @@ window.getScores = () => {
         }
     )
 }
+
+function parseLocalDate(inputValue) {  
+    const [year, month, day] = inputValue.split('-').map(Number);
+
+    // Set to midnight of local date (otherwise ends up being UTC midnight)
+    const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+  
+    return date;
+  }
 
 window.openAppSettings = () => {
     Sahha.openAppSettings()

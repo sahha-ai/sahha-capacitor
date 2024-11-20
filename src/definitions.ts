@@ -96,6 +96,6 @@ export interface SahhaPlugin {
   postDemographic(options: { demographic: SahhaDemographic }): Promise<{ success: boolean }>;
   getSensorStatus(options: { sensors: SahhaSensor[] }): Promise<{ status: SahhaSensorStatus }>;
   enableSensors(options: { sensors: SahhaSensor[] }): Promise<{ status: SahhaSensorStatus }>;
-  getScores(options: { types: SahhaScoreType[] }): Promise<{ value: string }>;
+  getScores(options: { types: SahhaScoreType[]; startDate?: number; endDate?: number }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
 }
