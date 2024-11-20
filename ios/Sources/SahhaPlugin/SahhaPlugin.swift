@@ -25,6 +25,17 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise)
     ]
     
+    private func encodeToJSONString<T: Encodable>(_ value: T) throws -> String {
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.outputFormatting = .prettyPrinted
+        let jsonData = try jsonEncoder.encode(value)
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        } else {
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: [], debugDescription: "Unable to encode value"))
+        }
+    }
+    
     @objc func configure(_ call: CAPPluginCall) {
         guard let settings = call.getObject("settings") else {
             call.reject("Sahha configure settings parameter is missing")
@@ -115,14 +126,8 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else if let value = value {
                 do {
-                    let jsonEncoder = JSONEncoder()
-                    jsonEncoder.outputFormatting = .prettyPrinted
-                    let jsonData = try jsonEncoder.encode(value)
-                    if let string = String(data: jsonData, encoding: .utf8) {
-                        call.resolve(["demographic": string])
-                    } else {
-                        call.reject("Sahha demographic data error")
-                    }
+                    let jsonString = try self.encodeToJSONString(value)
+                    call.resolve(["demographic": jsonString])
                 } catch let encodingError {
                     print(encodingError)
                     call.reject(encodingError.localizedDescription)
@@ -243,6 +248,62 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else {
                 call.resolve(["status" : sensorStatus.rawValue])
+            }
+        }
+    }
+    
+    @objc func getScores(_ call: CAPPluginCall) {
+        guard let types = call.getArray("types", String.self) else {
+            call.reject("Sahha getScores types parameter is missing")
+            return
+        }
+        
+        var sahhaScoreTypes = Set<SahhaScoreType>()
+        for type in types {
+            if let scoreType = SahhaScoreType(rawValue: type) {
+                sahhaScoreTypes.insert(scoreType)
+            } else {
+                call.reject("Sahha score type parameter is invalid")
+                return
+            }
+        }
+        
+        let startDateEpochMilli = call.getDouble("startDate")
+        let endDateEpochMilli = call.getDouble("endDate")
+        if let startDateEpochMilli = startDateEpochMilli, let endDateEpochMilli = endDateEpochMilli {
+            let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+            let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+            
+            Sahha.getScores(sahhaScoreTypes, dates:(startDate, endDate)) { error, scores in
+                if let error = error {
+                    call.reject(error)
+                } else if let scores = scores {
+                    do {
+                        let jsonString = try self.encodeToJSONString(scores)
+                        call.resolve(["value": jsonString])
+                    } catch let encodingError {
+                        print(encodingError)
+                        call.reject(encodingError.localizedDescription)
+                    }
+                } else {
+                    call.reject("No scores found")
+                }
+            }
+        } else {
+            Sahha.getScores(sahhaScoreTypes) { error, scores in
+                if let error = error {
+                    call.reject(error)
+                } else if let scores = scores {
+                    do {
+                        let jsonString = try self.encodeToJSONString(scores)
+                        call.resolve(["value": jsonString])
+                    } catch let encodingError {
+                        print(encodingError)
+                        call.reject(encodingError.localizedDescription)
+                    }
+                } else {
+                    call.reject("No scores found")
+                }
             }
         }
     }
