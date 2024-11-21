@@ -67,7 +67,7 @@ window.postDemographic = () => {
     Sahha.postDemographic({
         demographic: {
             gender: gender !== "" ? gender : null,
-            age: age !== "" ? age : null
+            age: age !== "" ? parseInt(age) : null
         }
     }).then(
         function (response) {
@@ -126,7 +126,7 @@ window.enableSensors = () => {
 }
 
 window.getScores = () => {
-    const scoreTypes = [SahhaScoreType.activity, SahhaScoreType.sleep, SahhaScoreType.readiness, SahhaScoreType.wellbeing, SahhaScoreType.mental_wellbeing];
+    const scoreTypes = [SahhaScoreType.activity];
     const startDate = document.getElementById("startDate").value;
     const endDate = document.getElementById("endDate").value;
     const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
@@ -134,10 +134,11 @@ window.getScores = () => {
     const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
     console.log('endDateJS ' + endDateEpochMilli);
 
+    document.getElementById("scoreText").innerText = "Loading..."
+
     Sahha.getScores({ types: scoreTypes, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
         function (response) {
-            console.log(response);
-            document.getElementById("scoreText").innerText = response.value;
+            document.getElementById("scoreText").innerText = response.value
         },
         function (error) {
             console.log(error);

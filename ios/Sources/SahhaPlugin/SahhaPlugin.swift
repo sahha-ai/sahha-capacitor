@@ -22,7 +22,8 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "postDemographic", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getSensorStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "enableSensors", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getScores", returnType: CAPPluginReturnPromise),
     ]
     
     private func encodeToJSONString<T: Encodable>(_ value: T) throws -> String {
@@ -48,7 +49,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         var sahhaSettings = SahhaSettings(environment: sahhaEnvironment)
         sahhaSettings.framework = .capacitor
-                
+        
         Sahha.configure(sahhaSettings) {
             call.resolve([
                 "success": true
@@ -107,7 +108,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-
+    
     @objc func deauthenticate(_ call: CAPPluginCall) {
         Sahha.deauthenticate { error, success in
             if let error = error {
@@ -268,42 +269,20 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
         
-        let startDateEpochMilli = call.getDouble("startDate")
-        let endDateEpochMilli = call.getDouble("endDate")
-        if let startDateEpochMilli = startDateEpochMilli, let endDateEpochMilli = endDateEpochMilli {
+        var dates: (startDate: Date, endDate: Date)?
+        if let startDateEpochMilli = call.getDouble("startDate"), let endDateEpochMilli = call.getDouble("endDate") {
             let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
             let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-            
-            Sahha.getScores(sahhaScoreTypes, dates:(startDate, endDate)) { error, scores in
-                if let error = error {
-                    call.reject(error)
-                } else if let scores = scores {
-                    do {
-                        let jsonString = try self.encodeToJSONString(scores)
-                        call.resolve(["value": jsonString])
-                    } catch let encodingError {
-                        print(encodingError)
-                        call.reject(encodingError.localizedDescription)
-                    }
-                } else {
-                    call.reject("No scores found")
-                }
-            }
-        } else {
-            Sahha.getScores(sahhaScoreTypes) { error, scores in
-                if let error = error {
-                    call.reject(error)
-                } else if let scores = scores {
-                    do {
-                        let jsonString = try self.encodeToJSONString(scores)
-                        call.resolve(["value": jsonString])
-                    } catch let encodingError {
-                        print(encodingError)
-                        call.reject(encodingError.localizedDescription)
-                    }
-                } else {
-                    call.reject("No scores found")
-                }
+            dates = (startDate, endDate)
+        }
+        
+        Sahha.getScores(sahhaScoreTypes, dates: dates) { error, scores in
+            if let error = error {
+                call.reject(error)
+            } else if let scores = scores {
+                call.resolve(["value": scores])
+            } else {
+                call.reject("No scores found")
             }
         }
     }
