@@ -138,7 +138,13 @@ window.getScores = () => {
 
     Sahha.getScores({ types: scoreTypes, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
         function (response) {
-            document.getElementById("scoreText").innerText = response.value
+            const array = JSON.parse(response.value);
+            const element = array[0];
+            if (element) {
+                document.getElementById("scoreText").innerText = JSON.stringify(element);
+            } else {
+                document.getElementById("scoreText").innerText = "Whoops"
+            }
         },
         function (error) {
             console.log(error);
