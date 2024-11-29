@@ -26,10 +26,8 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getScores", returnType: CAPPluginReturnPromise),
     ]
     
-    private func encodeToJSONString<T: Encodable>(_ value: T) throws -> String {
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.outputFormatting = .prettyPrinted
-        let jsonData = try jsonEncoder.encode(value)
+    private func encodeJson<T: Encodable>(_ value: T) throws -> String {
+        let jsonData = try JSONEncoder().encode(value)
         if let jsonString = String(data: jsonData, encoding: .utf8) {
             return jsonString
         } else {
