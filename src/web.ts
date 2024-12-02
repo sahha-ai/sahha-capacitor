@@ -7,6 +7,8 @@ import type {
   SahhaSensor,
   SahhaSensorStatus,
   SahhaScoreType,
+  SahhaBiomarkerCategory,
+  SahhaBiomarkerType,
 } from './definitions';
 
 export class SahhaWeb extends WebPlugin implements SahhaPlugin {
@@ -70,7 +72,23 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     console.log('endDate', options.endDate);
     return {
       value:
-        '[{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-23T15:00:00+00:00","periodicity":"daily","value":"40","type":"steps","endDateTime":"2024-11-24T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-24T15:00:00+00:00","periodicity":"daily","value":"3662","type":"steps","endDateTime":"2024-11-25T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-25T15:00:00+00:00","periodicity":"daily","value":"8878","type":"steps","endDateTime":"2024-11-26T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-26T15:00:00+00:00","periodicity":"daily","value":"4442","type":"steps","endDateTime":"2024-11-27T14:59:59+00:00"}]'
+        '[{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-23T15:00:00+00:00","periodicity":"daily","value":"40","type":"steps","endDateTime":"2024-11-24T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-24T15:00:00+00:00","periodicity":"daily","value":"3662","type":"steps","endDateTime":"2024-11-25T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-25T15:00:00+00:00","periodicity":"daily","value":"8878","type":"steps","endDateTime":"2024-11-26T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-26T15:00:00+00:00","periodicity":"daily","value":"4442","type":"steps","endDateTime":"2024-11-27T14:59:59+00:00"}]',
+    };
+  }
+
+  async getBiomarkers(options: {
+    categories: SahhaBiomarkerCategory[];
+    types: SahhaBiomarkerType[];
+    startDate?: number;
+    endDate?: number;
+  }): Promise<{ value: string }> {
+    console.log('getBiomarkers categories', options.categories);
+    console.log('getBiomarkers types', options.types);
+    console.log('startDate', options.startDate);
+    console.log('endDate', options.endDate);
+
+    return {
+      value: 'PLACEHOLDER',
     };
   }
 

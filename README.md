@@ -44,6 +44,7 @@ npx cap sync
 * [`getSensorStatus(...)`](#getsensorstatus)
 * [`enableSensors(...)`](#enablesensors)
 * [`getScores(...)`](#getscores)
+* [`getBiomarkers(...)`](#getbiomarkers)
 * [`openAppSettings()`](#openappsettings)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
@@ -202,6 +203,21 @@ getScores(options: { types: SahhaScoreType[]; startDate?: number; endDate?: numb
 --------------------
 
 
+### getBiomarkers(...)
+
+```typescript
+getBiomarkers(options: { categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDate?: number; endDate?: number; }) => Promise<{ value: string; }>
+```
+
+| Param         | Type                                                                                                                      |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDate?: number; endDate?: number; }</code> |
+
+**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+
+--------------------
+
+
 ### openAppSettings()
 
 ```typescript
@@ -316,6 +332,79 @@ openAppSettings() => Promise<void>
 | **`sleep`**            | <code>'sleep'</code>            |
 | **`readiness`**        | <code>'readiness'</code>        |
 | **`mental_wellbeing`** | <code>'mental_wellbeing'</code> |
+
+
+#### SahhaBiomarkerCategory
+
+| Members              | Value                         |
+| -------------------- | ----------------------------- |
+| **`activity`**       | <code>'activity'</code>       |
+| **`body`**           | <code>'body'</code>           |
+| **`characteristic`** | <code>'characteristic'</code> |
+| **`reproductive`**   | <code>'reproductive'</code>   |
+| **`sleep`**          | <code>'sleep'</code>          |
+| **`vitals`**         | <code>'vitals'</code>         |
+
+
+#### SahhaBiomarkerType
+
+| Members                                | Value                                           |
+| -------------------------------------- | ----------------------------------------------- |
+| **`steps`**                            | <code>'steps'</code>                            |
+| **`floors_climbed`**                   | <code>'floors_climbed'</code>                   |
+| **`active_hours`**                     | <code>'active_hours'</code>                     |
+| **`active_duration`**                  | <code>'active_duration'</code>                  |
+| **`activity_low_intensity_duration`**  | <code>'activity_low_intensity_duration'</code>  |
+| **`activity_mid_intensity_duration`**  | <code>'activity_mid_intensity_duration'</code>  |
+| **`activity_high_intensity_duration`** | <code>'activity_high_intensity_duration'</code> |
+| **`activity_sedentary_duration`**      | <code>'activity_sedentary_duration'</code>      |
+| **`active_energy_burned`**             | <code>'active_energy_burned'</code>             |
+| **`total_energy_burned`**              | <code>'total_energy_burned'</code>              |
+| **`height`**                           | <code>'height'</code>                           |
+| **`weight`**                           | <code>'weight'</code>                           |
+| **`body_mass_index`**                  | <code>'body_mass_index'</code>                  |
+| **`body_fat`**                         | <code>'body_fat'</code>                         |
+| **`fat_mass`**                         | <code>'fat_mass'</code>                         |
+| **`lean_mass`**                        | <code>'lean_mass'</code>                        |
+| **`waist_circumference`**              | <code>'waist_circumference'</code>              |
+| **`resting_energy_burned`**            | <code>'resting_energy_burned'</code>            |
+| **`age`**                              | <code>'age'</code>                              |
+| **`biological_sex`**                   | <code>'biological_sex'</code>                   |
+| **`date_of_birth`**                    | <code>'date_of_birth'</code>                    |
+| **`menstrual_cycle_length`**           | <code>'menstrual_cycle_length'</code>           |
+| **`menstrual_cycle_start_date`**       | <code>'menstrual_cycle_start_date'</code>       |
+| **`menstrual_cycle_end_date`**         | <code>'menstrual_cycle_end_date'</code>         |
+| **`menstrual_phase`**                  | <code>'menstrual_phase'</code>                  |
+| **`menstrual_phase_start_date`**       | <code>'menstrual_phase_start_date'</code>       |
+| **`menstrual_phase_end_date`**         | <code>'menstrual_phase_end_date'</code>         |
+| **`menstrual_phase_length`**           | <code>'menstrual_phase_length'</code>           |
+| **`sleep_start_time`**                 | <code>'sleep_start_time'</code>                 |
+| **`sleep_end_time`**                   | <code>'sleep_end_time'</code>                   |
+| **`sleep_duration`**                   | <code>'sleep_duration'</code>                   |
+| **`sleep_debt`**                       | <code>'sleep_debt'</code>                       |
+| **`sleep_interruptions`**              | <code>'sleep_interruptions'</code>              |
+| **`sleep_in_bed_duration`**            | <code>'sleep_in_bed_duration'</code>            |
+| **`sleep_awake_duration`**             | <code>'sleep_awake_duration'</code>             |
+| **`sleep_light_duration`**             | <code>'sleep_light_duration'</code>             |
+| **`sleep_rem_duration`**               | <code>'sleep_rem_duration'</code>               |
+| **`sleep_deep_duration`**              | <code>'sleep_deep_duration'</code>              |
+| **`sleep_regularity`**                 | <code>'sleep_regularity'</code>                 |
+| **`sleep_latency`**                    | <code>'sleep_latency'</code>                    |
+| **`sleep_efficiency`**                 | <code>'sleep_efficiency'</code>                 |
+| **`heart_rate_resting`**               | <code>'heart_rate_resting'</code>               |
+| **`heart_rate_sleep`**                 | <code>'heart_rate_sleep'</code>                 |
+| **`heart_rate_variability_sdnn`**      | <code>'heart_rate_variability_sdnn'</code>      |
+| **`heart_rate_variability_rmssd`**     | <code>'heart_rate_variability_rmssd'</code>     |
+| **`respiratory_rate`**                 | <code>'respiratory_rate'</code>                 |
+| **`respiratory_rate_sleep`**           | <code>'respiratory_rate_sleep'</code>           |
+| **`oxygen_saturation`**                | <code>'oxygen_saturation'</code>                |
+| **`oxygen_saturation_sleep`**          | <code>'oxygen_saturation_sleep'</code>          |
+| **`vo2_max`**                          | <code>'vo2_max'</code>                          |
+| **`blood_glucose`**                    | <code>'blood_glucose'</code>                    |
+| **`blood_pressure_systolic`**          | <code>'blood_pressure_systolic'</code>          |
+| **`blood_pressure_diastolic`**         | <code>'blood_pressure_diastolic'</code>         |
+| **`body_temperature_basal`**           | <code>'body_temperature_basal'</code>           |
+| **`skin_temperature_sleep`**           | <code>'skin_temperature_sleep'</code>           |
 
 </docgen-api>
 

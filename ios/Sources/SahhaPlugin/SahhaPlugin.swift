@@ -24,6 +24,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "enableSensors", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getScores", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getBiomarkers", returnType: CAPPluginReturnPromise),
     ]
     
     private func encodeJson<T: Encodable>(_ value: T) throws -> String {
@@ -125,7 +126,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else if let value = value {
                 do {
-                    let jsonString = try self.encodeToJSONString(value)
+                    let jsonString = try self.encodeJson(value)
                     call.resolve(["demographic": jsonString])
                 } catch let encodingError {
                     print(encodingError)
@@ -279,6 +280,55 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else if let scores = scores {
                 call.resolve(["value": scores])
+            } else {
+                call.reject("No scores found")
+            }
+        }
+    }
+    
+    @objc func getBiomarkers(_ call: CAPPluginCall) {
+        guard let categories = call.getArray("categories", String.self) else {
+            call.reject("Sahha getBiomarkers categories parameter is missing")
+            return
+        }
+        
+        guard let types = call.getArray("types", String.self) else {
+            call.reject("Sahha getBiomarkers types parameter is missing")
+            return
+        }
+        
+        var sahhaBiomarkerCategories = Set<SahhaBiomarkerCategory>()
+        for category in categories {
+            if let biomarkerCategory = SahhaBiomarkerCategory(rawValue: category) {
+                sahhaBiomarkerCategories.insert(biomarkerCategory)
+            } else {
+                call.reject("Sahha biomarker category parameter is invalid")
+                return
+            }
+        }
+        
+        var sahhaBiomarkerTypes = Set<SahhaBiomarkerType>()
+        for type in types {
+            if let biomarkerType = SahhaBiomarkerType(rawValue: type) {
+                sahhaBiomarkerTypes.insert(biomarkerType)
+            } else {
+                call.reject("Sahha biomarker type parameter is invalid")
+                return
+            }
+        }
+        
+        var dates: (startDate: Date, endDate: Date)?
+        if let startDateEpochMilli = call.getDouble("startDate"), let endDateEpochMilli = call.getDouble("endDate") {
+            let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+            let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+            dates = (startDate, endDate)
+        }
+        
+        Sahha.getBiomarkers(categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes, dates: dates) { error, biomarkers in
+            if let error = error {
+                call.reject(error)
+            } else if let biomarkers = biomarkers {
+                call.resolve(["value": biomarkers])
             } else {
                 call.reject("No scores found")
             }

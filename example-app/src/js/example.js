@@ -1,5 +1,6 @@
 import { Sahha, SahhaEnvironment, SahhaSensor, SahhaSensorStatus } from 'sahha-capacitor';
 import { SahhaScoreType } from '../../../dist/esm/definitions';
+import { SahhaBiomarkerCategory, SahhaBiomarkerType } from '../../../dist/esm/definitions';
 
 window.setup = () => {
 
@@ -127,8 +128,8 @@ window.enableSensors = () => {
 
 window.getScores = () => {
     const scoreTypes = [SahhaScoreType.activity];
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
+    const startDate = document.getElementById("startDateScores").value;
+    const endDate = document.getElementById("endDateScores").value;
     const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
     console.log('startDateJS ' + startDateEpochMilli);
     const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
@@ -141,10 +142,44 @@ window.getScores = () => {
             const array = JSON.parse(response.value);
             const element = array[0];
             if (element) {
-                document.getElementById("scoreText").innerText = JSON.stringify(element);
+                const jsonString = JSON.stringify(element);
+                console.log(jsonString);
             } else {
-                document.getElementById("scoreText").innerText = "Whoops"
+                const error = "Failed to retrieve first index of json array"
+                console.log(error);
             }
+            document.getElementById("scoreText").innerText = response.value;
+        },
+        function (error) {
+            console.log(error);
+        }
+    )
+}
+
+window.getBiomarkers = () => {
+    const biomarkerCategories = [SahhaBiomarkerCategory.activity];
+    const biomarkerTypes = [SahhaBiomarkerType.steps];
+    const startDate = document.getElementById("startDateBiomarkers").value;
+    const endDate = document.getElementById("endDateBiomarkers").value;
+    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
+    console.log('startDateJS ' + startDateEpochMilli);
+    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
+    console.log('endDateJS ' + endDateEpochMilli);
+
+    document.getElementById("biomarkerText").innerText = "Loading..."
+
+    Sahha.getBiomarkers({ categories: biomarkerCategories, types: biomarkerTypes, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
+        function (response) {
+            const array = JSON.parse(response.value);
+            const element = array[0];
+            if (element) {
+                const jsonString = JSON.stringify(element);
+                console.log(jsonString);
+            } else {
+                const error = "Failed to retrieve first index of json array"
+                console.log(error);
+            }
+            document.getElementById("biomarkerText").innerText = response.value;
         },
         function (error) {
             console.log(error);

@@ -9,6 +9,8 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.google.gson.GsonBuilder
 import sdk.sahha.android.source.Sahha
+import sdk.sahha.android.source.SahhaBiomarkerCategory
+import sdk.sahha.android.source.SahhaBiomarkerType
 import sdk.sahha.android.source.SahhaConverterUtility
 import sdk.sahha.android.source.SahhaDemographic
 import sdk.sahha.android.source.SahhaEnvironment
@@ -353,6 +355,86 @@ public class SahhaPlugin : Plugin() {
             }
         } else {
             Sahha.getScores(sahhaScoreTypes) { error, value ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("value", value)
+                    call.resolve(data)
+                }
+            }
+        }
+    }
+
+    @PluginMethod
+    fun getBiomarkers(call: PluginCall) {
+        val categories: JSArray? = call.getArray("categories")
+        val types: JSArray? = call.getArray("types")
+        val startDateEpochMilli: Long? = call.getLong("startDate")
+        println("startDate provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDate")
+        println("endDate provided: $endDateEpochMilli")
+
+        if (categories == null) {
+            call.reject("Sahha getBiomarkers categories parameter is missing")
+            return
+        }
+
+        if (types == null) {
+            call.reject("Sahha getBiomarkers types parameter is missing")
+            return
+        }
+
+        val sahhaBiomarkerCategories: MutableSet<SahhaBiomarkerCategory> =
+            mutableSetOf<SahhaBiomarkerCategory>()
+        try {
+            for (i in 0 until categories.length()) {
+                val category: String = categories.getString(i)
+                val biomarkerCategory = SahhaBiomarkerCategory.valueOf(category)
+                sahhaBiomarkerCategories.add(biomarkerCategory)
+            }
+        } catch (e: IllegalArgumentException) {
+            call.reject("Sahha biomarker category parameter is not valid")
+            return
+        }
+
+        val sahhaBiomarkerTypes: MutableSet<SahhaBiomarkerType> = mutableSetOf<SahhaBiomarkerType>()
+        try {
+            for (i in 0 until types.length()) {
+                val type: String = types.getString(i)
+                val biomarkerType = SahhaBiomarkerType.valueOf(type)
+                sahhaBiomarkerTypes.add(biomarkerType)
+            }
+        } catch (e: IllegalArgumentException) {
+            call.reject("Sahha biomarker type parameter is not valid")
+            return
+        }
+
+        val startDateIsNotNull = startDateEpochMilli != null
+        val endDateIsNotNull = endDateEpochMilli != null
+
+        if (startDateIsNotNull && endDateIsNotNull) {
+            val defaultZoneId = ZoneId.systemDefault()
+            val startInstant = Instant.ofEpochMilli(startDateEpochMilli!!)
+            val startLocalDateTime = LocalDateTime.ofInstant(startInstant, defaultZoneId)
+            val endInstant = Instant.ofEpochMilli(endDateEpochMilli!!)
+            val endLocalDateTime = LocalDateTime.ofInstant(endInstant, defaultZoneId)
+
+            Sahha.getBiomarkers(
+                sahhaBiomarkerCategories,
+                sahhaBiomarkerTypes,
+                Pair(startLocalDateTime, endLocalDateTime)
+            ) { error, value ->
+                if (error != null) {
+                    call.reject(error)
+                } else {
+                    val data = JSObject()
+                    data.put("value", value)
+                    call.resolve(data)
+                }
+            }
+        } else {
+            Sahha.getBiomarkers(sahhaBiomarkerCategories, sahhaBiomarkerTypes) { error, value ->
                 if (error != null) {
                     call.reject(error)
                 } else {

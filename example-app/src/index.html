@@ -93,16 +93,31 @@
     <div>
       <div>
         <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate">
+        <input type="date" id="startDateScores" name="startDateScores">
       </div>
       <div>
         <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate">
+        <input type="date" id="endDateScores" name="endDateScores">
       </div>
       <button onclick="getScores()">Get Scores</button>
     </div>
     <div>
       <p id="scoreText"></p>
+    </div>
+    <hr class="solid">
+    <div>
+      <div>
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDateBiomarkers" name="startDateBiomarkers">
+      </div>
+      <div>
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDateBiomarkers" name="endDateBiomarkers">
+      </div>
+      <button onclick="getBiomarkers()">Get Biomarkers</button>
+    </div>
+    <div>
+      <p id="biomarkerText"></p>
     </div>
   </main>
   <script src="./js/example.js" type="module"></script>
