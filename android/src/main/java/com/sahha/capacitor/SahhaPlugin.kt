@@ -1,6 +1,7 @@
 package com.sahha.capacitor;
 
 import android.util.Log
+import androidx.activity.ComponentActivity
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
@@ -30,20 +31,20 @@ public class SahhaPlugin : Plugin() {
     @PluginMethod
     fun configure(call: PluginCall) {
 
-        var settings: JSObject? = call.getObject("settings")
+        val settings: JSObject? = call.getObject("settings")
 
         if (settings == null) {
             call.reject("Sahha configure settings parameter is missing")
             return
         }
 
-        var environment: String? = settings.getString("environment")
+        val environment: String? = settings.getString("environment")
         if (environment == null) {
             call.reject("Sahha configure settings environment parameter is missing")
             return
         }
 
-        var sahhaEnvironment: SahhaEnvironment
+        val sahhaEnvironment: SahhaEnvironment
         try {
             sahhaEnvironment = SahhaEnvironment.valueOf(environment)
         } catch (e: IllegalArgumentException) {
@@ -74,17 +75,17 @@ public class SahhaPlugin : Plugin() {
         }
         // Notification config ends
 
-        var sahhaSettings = SahhaSettings(
+        val sahhaSettings = SahhaSettings(
             sahhaEnvironment,
             sahhaNotificationConfiguration,
             SahhaFramework.capacitor
         )
 
-        var app = activity?.application
-        if (app == null) {
+        val activity = activity as? ComponentActivity
+        if (activity == null) {
             call.reject("Sahha configure app is missing")
         } else {
-            Sahha.configure(app, sahhaSettings) { error, success ->
+            Sahha.configure(activity, sahhaSettings) { error, success ->
                 if (error != null) {
                     call.reject(error)
                 } else {
