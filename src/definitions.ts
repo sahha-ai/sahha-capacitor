@@ -7,7 +7,7 @@ export enum SahhaSensor {
   gender = 'gender',
   date_of_birth = 'date_of_birth',
   sleep = 'sleep',
-  step_count = 'step_count',
+  steps = 'steps',
   floor_count = 'floor_count',
   heart_rate = 'heart_rate',
   resting_heart_rate = 'resting_heart_rate',
@@ -86,30 +86,15 @@ export interface SahhaDemographic {
 }
 
 export interface SahhaPlugin {
-  configure(options: {
-    settings: SahhaSettings;
-  }): Promise<{ success: boolean }>;
+  configure(options: { settings: SahhaSettings }): Promise<{ success: boolean }>;
   isAuthenticated(): Promise<{ success: boolean }>;
-  authenticate(options: {
-    appId: string;
-    appSecret: string;
-    externalId: string;
-  }): Promise<{ success: boolean }>;
-  authenticateToken(options: {
-    profileToken: string;
-    refreshToken: string;
-  }): Promise<{ success: boolean }>;
+  authenticate(options: { appId: string; appSecret: string; externalId: string }): Promise<{ success: boolean }>;
+  authenticateToken(options: { profileToken: string; refreshToken: string }): Promise<{ success: boolean }>;
   deauthenticate(): Promise<{ success: boolean }>;
   getProfileToken(): Promise<{ profileToken?: string }>;
   getDemographic(): Promise<{ demographic?: string }>;
-  postDemographic(options: {
-    demographic: SahhaDemographic;
-  }): Promise<{ success: boolean }>;
-  getSensorStatus(options: {
-    sensors: SahhaSensor[];
-  }): Promise<{ status: SahhaSensorStatus }>;
-  enableSensors(options: {
-    sensors: SahhaSensor[];
-  }): Promise<{ status: SahhaSensorStatus }>;
+  postDemographic(options: { demographic: SahhaDemographic }): Promise<{ success: boolean }>;
+  getSensorStatus(options: { sensors: SahhaSensor[] }): Promise<{ status: SahhaSensorStatus }>;
+  enableSensors(options: { sensors: SahhaSensor[] }): Promise<{ status: SahhaSensorStatus }>;
   openAppSettings(): Promise<void>;
 }

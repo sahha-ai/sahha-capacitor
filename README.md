@@ -33,19 +33,19 @@ npx cap sync
 
 <docgen-index>
 
-* [`configure(...)`](#configure)
-* [`isAuthenticated()`](#isauthenticated)
-* [`authenticate(...)`](#authenticate)
-* [`authenticateToken(...)`](#authenticatetoken)
-* [`deauthenticate()`](#deauthenticate)
-* [`getProfileToken()`](#getprofiletoken)
-* [`getDemographic()`](#getdemographic)
-* [`postDemographic(...)`](#postdemographic)
-* [`getSensorStatus(...)`](#getsensorstatus)
-* [`enableSensors(...)`](#enablesensors)
-* [`openAppSettings()`](#openappsettings)
-* [Interfaces](#interfaces)
-* [Enums](#enums)
+- [`configure(...)`](#configure)
+- [`isAuthenticated()`](#isauthenticated)
+- [`authenticate(...)`](#authenticate)
+- [`authenticateToken(...)`](#authenticatetoken)
+- [`deauthenticate()`](#deauthenticate)
+- [`getProfileToken()`](#getprofiletoken)
+- [`getDemographic()`](#getdemographic)
+- [`postDemographic(...)`](#postdemographic)
+- [`getSensorStatus(...)`](#getsensorstatus)
+- [`enableSensors(...)`](#enablesensors)
+- [`openAppSettings()`](#openappsettings)
+- [Interfaces](#interfaces)
+- [Enums](#enums)
 
 </docgen-index>
 
@@ -64,8 +64,7 @@ configure(options: { settings: SahhaSettings; }) => Promise<{ success: boolean; 
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
---------------------
-
+---
 
 ### isAuthenticated()
 
@@ -75,8 +74,7 @@ isAuthenticated() => Promise<{ success: boolean; }>
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
---------------------
-
+---
 
 ### authenticate(...)
 
@@ -90,8 +88,7 @@ authenticate(options: { appId: string; appSecret: string; externalId: string; })
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
---------------------
-
+---
 
 ### authenticateToken(...)
 
@@ -105,8 +102,7 @@ authenticateToken(options: { profileToken: string; refreshToken: string; }) => P
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
---------------------
-
+---
 
 ### deauthenticate()
 
@@ -116,8 +112,7 @@ deauthenticate() => Promise<{ success: boolean; }>
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
---------------------
-
+---
 
 ### getProfileToken()
 
@@ -127,8 +122,7 @@ getProfileToken() => Promise<{ profileToken?: string; }>
 
 **Returns:** <code>Promise&lt;{ profileToken?: string; }&gt;</code>
 
---------------------
-
+---
 
 ### getDemographic()
 
@@ -138,8 +132,7 @@ getDemographic() => Promise<{ demographic?: string; }>
 
 **Returns:** <code>Promise&lt;{ demographic?: string; }&gt;</code>
 
---------------------
-
+---
 
 ### postDemographic(...)
 
@@ -153,8 +146,7 @@ postDemographic(options: { demographic: SahhaDemographic; }) => Promise<{ succes
 
 **Returns:** <code>Promise&lt;{ success: boolean; }&gt;</code>
 
---------------------
-
+---
 
 ### getSensorStatus(...)
 
@@ -168,8 +160,7 @@ getSensorStatus(options: { sensors: SahhaSensor[]; }) => Promise<{ status: Sahha
 
 **Returns:** <code>Promise&lt;{ status: <a href="#sahhasensorstatus">SahhaSensorStatus</a>; }&gt;</code>
 
---------------------
-
+---
 
 ### enableSensors(...)
 
@@ -183,8 +174,7 @@ enableSensors(options: { sensors: SahhaSensor[]; }) => Promise<{ status: SahhaSe
 
 **Returns:** <code>Promise&lt;{ status: <a href="#sahhasensorstatus">SahhaSensorStatus</a>; }&gt;</code>
 
---------------------
-
+---
 
 ### openAppSettings()
 
@@ -192,11 +182,9 @@ enableSensors(options: { sensors: SahhaSensor[]; }) => Promise<{ status: SahhaSe
 openAppSettings() => Promise<void>
 ```
 
---------------------
-
+---
 
 ### Interfaces
-
 
 #### SahhaSettings
 
@@ -205,7 +193,6 @@ openAppSettings() => Promise<void>
 | **`environment`**          | <code><a href="#sahhaenvironment">SahhaEnvironment</a></code>              |
 | **`sensors`**              | <code>SahhaSensor[]</code>                                                 |
 | **`notificationSettings`** | <code>{ icon?: string; title?: string; shortDescription?: string; }</code> |
-
 
 #### SahhaDemographic
 
@@ -225,9 +212,7 @@ openAppSettings() => Promise<void>
 | **`livingArrangement`** | <code>string</code> |
 | **`birthDate`**         | <code>string</code> |
 
-
 ### Enums
-
 
 #### SahhaEnvironment
 
@@ -236,7 +221,6 @@ openAppSettings() => Promise<void>
 | **`sandbox`**    | <code>'sandbox'</code>    |
 | **`production`** | <code>'production'</code> |
 
-
 #### SahhaSensor
 
 | Members                            | Value                                       |
@@ -244,7 +228,7 @@ openAppSettings() => Promise<void>
 | **`gender`**                       | <code>'gender'</code>                       |
 | **`date_of_birth`**                | <code>'date_of_birth'</code>                |
 | **`sleep`**                        | <code>'sleep'</code>                        |
-| **`step_count`**                   | <code>'step_count'</code>                   |
+| **`steps`**                        | <code>'steps'</code>                        |
 | **`floor_count`**                  | <code>'floor_count'</code>                  |
 | **`heart_rate`**                   | <code>'heart_rate'</code>                   |
 | **`resting_heart_rate`**           | <code>'resting_heart_rate'</code>           |
@@ -279,7 +263,6 @@ openAppSettings() => Promise<void>
 | **`activity_summary`**             | <code>'activity_summary'</code>             |
 | **`device_lock`**                  | <code>'device_lock'</code>                  |
 | **`exercise`**                     | <code>'exercise'</code>                     |
-
 
 #### SahhaSensorStatus
 

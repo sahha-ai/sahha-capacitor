@@ -97,7 +97,7 @@ window.getDemographic = () => {
     )
 }
 
-let sensors = [SahhaSensor.sleep, SahhaSensor.step_count, SahhaSensor.floor_count, SahhaSensor.active_energy_burned, SahhaSensor.heart_rate];
+let sensors = [SahhaSensor.sleep, SahhaSensor.steps, SahhaSensor.floor_count, SahhaSensor.active_energy_burned, SahhaSensor.heart_rate];
 
 window.getSensorStatus = () => {
     Sahha.getSensorStatus({ sensors: sensors }).then(
