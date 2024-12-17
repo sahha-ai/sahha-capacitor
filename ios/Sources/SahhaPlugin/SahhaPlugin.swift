@@ -22,8 +22,19 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "postDemographic", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getSensorStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "enableSensors", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getScores", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getBiomarkers", returnType: CAPPluginReturnPromise),
     ]
+    
+    private func encodeJson<T: Encodable>(_ value: T) throws -> String {
+        let jsonData = try JSONEncoder().encode(value)
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        } else {
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: [], debugDescription: "Unable to encode value"))
+        }
+    }
     
     @objc func configure(_ call: CAPPluginCall) {
         guard let settings = call.getObject("settings") else {
@@ -37,7 +48,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         var sahhaSettings = SahhaSettings(environment: sahhaEnvironment)
         sahhaSettings.framework = .capacitor
-                
+        
         Sahha.configure(sahhaSettings) {
             call.resolve([
                 "success": true
@@ -96,7 +107,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-
+    
     @objc func deauthenticate(_ call: CAPPluginCall) {
         Sahha.deauthenticate { error, success in
             if let error = error {
@@ -115,14 +126,8 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else if let value = value {
                 do {
-                    let jsonEncoder = JSONEncoder()
-                    jsonEncoder.outputFormatting = .prettyPrinted
-                    let jsonData = try jsonEncoder.encode(value)
-                    if let string = String(data: jsonData, encoding: .utf8) {
-                        call.resolve(["demographic": string])
-                    } else {
-                        call.reject("Sahha demographic data error")
-                    }
+                    let jsonString = try self.encodeJson(value)
+                    call.resolve(["demographic": jsonString])
                 } catch let encodingError {
                     print(encodingError)
                     call.reject(encodingError.localizedDescription)
@@ -243,6 +248,89 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else {
                 call.resolve(["status" : sensorStatus.rawValue])
+            }
+        }
+    }
+    
+    @objc func getScores(_ call: CAPPluginCall) {
+        guard let types = call.getArray("types", String.self) else {
+            call.reject("Sahha getScores types parameter is missing")
+            return
+        }
+        
+        var sahhaScoreTypes = Set<SahhaScoreType>()
+        for type in types {
+            if let scoreType = SahhaScoreType(rawValue: type) {
+                sahhaScoreTypes.insert(scoreType)
+            } else {
+                call.reject("Sahha score type parameter is invalid")
+                return
+            }
+        }
+        
+        var dates: (startDate: Date, endDate: Date)?
+        if let startDateEpochMilli = call.getDouble("startDate"), let endDateEpochMilli = call.getDouble("endDate") {
+            let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+            let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+            dates = (startDate, endDate)
+        }
+        
+        Sahha.getScores(sahhaScoreTypes, dates: dates) { error, scores in
+            if let error = error {
+                call.reject(error)
+            } else if let scores = scores {
+                call.resolve(["value": scores])
+            } else {
+                call.reject("No scores found")
+            }
+        }
+    }
+    
+    @objc func getBiomarkers(_ call: CAPPluginCall) {
+        guard let categories = call.getArray("categories", String.self) else {
+            call.reject("Sahha getBiomarkers categories parameter is missing")
+            return
+        }
+        
+        guard let types = call.getArray("types", String.self) else {
+            call.reject("Sahha getBiomarkers types parameter is missing")
+            return
+        }
+        
+        var sahhaBiomarkerCategories = Set<SahhaBiomarkerCategory>()
+        for category in categories {
+            if let biomarkerCategory = SahhaBiomarkerCategory(rawValue: category) {
+                sahhaBiomarkerCategories.insert(biomarkerCategory)
+            } else {
+                call.reject("Sahha biomarker category parameter is invalid")
+                return
+            }
+        }
+        
+        var sahhaBiomarkerTypes = Set<SahhaBiomarkerType>()
+        for type in types {
+            if let biomarkerType = SahhaBiomarkerType(rawValue: type) {
+                sahhaBiomarkerTypes.insert(biomarkerType)
+            } else {
+                call.reject("Sahha biomarker type parameter is invalid")
+                return
+            }
+        }
+        
+        var dates: (startDate: Date, endDate: Date)?
+        if let startDateEpochMilli = call.getDouble("startDate"), let endDateEpochMilli = call.getDouble("endDate") {
+            let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+            let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+            dates = (startDate, endDate)
+        }
+        
+        Sahha.getBiomarkers(categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes, dates: dates) { error, biomarkers in
+            if let error = error {
+                call.reject(error)
+            } else if let biomarkers = biomarkers {
+                call.resolve(["value": biomarkers])
+            } else {
+                call.reject("No scores found")
             }
         }
     }
