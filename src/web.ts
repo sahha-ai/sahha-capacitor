@@ -92,6 +92,16 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     };
   }
 
+  async getStats(options: { sensor: SahhaSensor; startDate: number; endDate: number }): Promise<{ value: string }> {
+    console.log('getStats sensor', options.sensor);
+    console.log('startDate', options.startDate);
+    console.log('endDate', options.endDate);
+
+    return {
+      value: 'PLACEHOLDER',
+    };
+  }
+
   async openAppSettings(): Promise<void> {
     console.log('openAppSettings');
     return;

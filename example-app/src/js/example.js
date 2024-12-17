@@ -187,6 +187,36 @@ window.getBiomarkers = () => {
     )
 }
 
+window.getStats = () => {
+    const sensor = SahhaSensor.steps
+    const startDate = document.getElementById("startDateStats").value;
+    const endDate = document.getElementById("endDateStats").value;
+    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
+    console.log('startDateJS ' + startDateEpochMilli);
+    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
+    console.log('endDateJS ' + endDateEpochMilli);
+
+    document.getElementById("statsText").innerText = "Loading..."
+
+    Sahha.getStats({ sensor: sensor, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
+        function (response) {
+            const array = JSON.parse(response.value);
+            const element = array[0];
+            if (element) {
+                const jsonString = JSON.stringify(element);
+                console.log(jsonString);
+            } else {
+                const error = "Failed to retrieve first index of json array"
+                console.log(error);
+            }
+            document.getElementById("statsText").innerText = response.value;
+        },
+        function (error) {
+            console.log(error);
+        }
+    )
+}
+
 function parseLocalDate(inputValue) {  
     const [year, month, day] = inputValue.split('-').map(Number);
 

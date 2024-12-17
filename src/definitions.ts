@@ -8,7 +8,7 @@ export enum SahhaSensor {
   date_of_birth = 'date_of_birth',
   sleep = 'sleep',
   steps = 'steps',
-  floor_count = 'floor_count',
+  floors_climbed = 'floors_climbed',
   heart_rate = 'heart_rate',
   resting_heart_rate = 'resting_heart_rate',
   walking_heart_rate_average = 'walking_heart_rate_average',
@@ -170,5 +170,6 @@ export interface SahhaPlugin {
     startDate?: number;
     endDate?: number;
   }): Promise<{ value: string }>;
+  getStats(options: { sensor: SahhaSensor; startDate: number; endDate: number }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
 }

@@ -9,6 +9,8 @@ import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializer
 import sdk.sahha.android.source.Sahha
 import sdk.sahha.android.source.SahhaBiomarkerCategory
 import sdk.sahha.android.source.SahhaBiomarkerType
@@ -23,6 +25,7 @@ import sdk.sahha.android.source.SahhaSettings
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 
 @CapacitorPlugin(name = "Sahha")
@@ -443,6 +446,57 @@ public class SahhaPlugin : Plugin() {
                     data.put("value", value)
                     call.resolve(data)
                 }
+            }
+        }
+    }
+
+    @PluginMethod
+    fun getStats(call: PluginCall) {
+        val sensor: String? = call.getString("sensor")
+        println("sensor provided: $sensor")
+        val startDateEpochMilli: Long? = call.getLong("startDate")
+        println("startDate provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDate")
+        println("endDate provided: $endDateEpochMilli")
+
+        if (sensor == null) {
+            call.reject("Sahha getStats sensor parameter is missing")
+            return
+        }
+
+        if (startDateEpochMilli == null) {
+            call.reject("Sahha getStats startDate parameter is missing")
+            return
+        }
+
+        if (endDateEpochMilli == null) {
+            call.reject("Sahha getStats endDate parameter is missing")
+            return
+        }
+
+        val defaultZoneId = ZoneId.systemDefault()
+        val startInstant = Instant.ofEpochMilli(startDateEpochMilli)
+        val startLocalDateTime = LocalDateTime.ofInstant(startInstant, defaultZoneId)
+        val endInstant = Instant.ofEpochMilli(endDateEpochMilli)
+        val endLocalDateTime = LocalDateTime.ofInstant(endInstant, defaultZoneId)
+
+        Sahha.getStats(
+            sensor = SahhaSensor.valueOf(sensor),
+            Pair(startLocalDateTime, endLocalDateTime)
+        ) { error, value ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val gson = GsonBuilder()
+                    .registerTypeAdapter(ZonedDateTime::class.java,
+                        JsonSerializer<ZonedDateTime> { src, _, _ ->
+                            JsonPrimitive(src.toString())
+                        }).create()
+
+                val statsJson = gson.toJson(value)
+                val data = JSObject()
+                data.put("value", statsJson)
+                call.resolve(data)
             }
         }
     }
