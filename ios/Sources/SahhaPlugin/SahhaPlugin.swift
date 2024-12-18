@@ -25,6 +25,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getScores", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getBiomarkers", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getStats", returnType: CAPPluginReturnPromise),
     ]
     
     private func encodeJson<T: Encodable>(_ value: T) throws -> String {
@@ -258,6 +259,16 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         
+        guard let startDateEpochMilli = call.getDouble("startDate") else {
+            call.reject("Sahha getScores startDate parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDate") else {
+            call.reject("Sahha getScores endDate parameter is missing")
+            return
+        }
+        
         var sahhaScoreTypes = Set<SahhaScoreType>()
         for type in types {
             if let scoreType = SahhaScoreType(rawValue: type) {
@@ -268,14 +279,10 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
         
-        var dates: (startDate: Date, endDate: Date)?
-        if let startDateEpochMilli = call.getDouble("startDate"), let endDateEpochMilli = call.getDouble("endDate") {
-            let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
-            let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-            dates = (startDate, endDate)
-        }
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
         
-        Sahha.getScores(sahhaScoreTypes, dates: dates) { error, scores in
+        Sahha.getScores(types: sahhaScoreTypes, startDate: startDate, endDate: endDate) { error, scores in
             if let error = error {
                 call.reject(error)
             } else if let scores = scores {
@@ -294,6 +301,16 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         
         guard let types = call.getArray("types", String.self) else {
             call.reject("Sahha getBiomarkers types parameter is missing")
+            return
+        }
+        
+        guard let startDateEpochMilli = call.getDouble("startDate") else {
+            call.reject("Sahha getBiomarkers startDate parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDate") else {
+            call.reject("Sahha getBiomarkers endDate parameter is missing")
             return
         }
         
@@ -317,21 +334,70 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
         
-        var dates: (startDate: Date, endDate: Date)?
-        if let startDateEpochMilli = call.getDouble("startDate"), let endDateEpochMilli = call.getDouble("endDate") {
-            let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
-            let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-            dates = (startDate, endDate)
-        }
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
         
-        Sahha.getBiomarkers(categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes, dates: dates) { error, biomarkers in
+        Sahha.getBiomarkers(categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes, startDate: startDate, endDate: endDate) { error, biomarkers in
             if let error = error {
                 call.reject(error)
             } else if let biomarkers = biomarkers {
                 call.resolve(["value": biomarkers])
             } else {
-                call.reject("No scores found")
+                call.reject("No biomarkers found")
             }
+        }
+    }
+    
+    @objc func getStats(_ call: CAPPluginCall) {
+        guard let sensor = call.getString("sensor") else {
+            call.reject("Sahha getStats sensor parameter is missing")
+            return
+        }
+        
+        guard let startDateEpochMilli = call.getDouble("startDate") else {
+            call.reject("Sahha getStats startDate parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDate") else {
+            call.reject("Sahha getStats endDate parameter is missing")
+            return
+        }
+        
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+        
+        if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+            Sahha.getStats(sensor: sahhaSensor, startDate: startDate, endDate: endDate) { error, stats in
+                if let error = error {
+                    call.reject(error)
+                } else if !stats.isEmpty {
+                    do {
+                        let jsonEncoder = JSONEncoder()
+                        jsonEncoder.outputFormatting = .prettyPrinted
+                        let jsonData = try jsonEncoder.encode(stats)
+                        if let string = String(data: jsonData, encoding: .utf8) {
+                            call.resolve(["value": string])
+                        } else {
+                            call.reject("Encoding error")
+                        }
+                    } catch let encodingError {
+                        print(encodingError)
+                        Sahha.postError(
+                            framework: .capacitor,
+                            message: encodingError.localizedDescription,
+                            path: "SahhaCapacitor", method: "getStats",
+                            body: "jsonEncoder")
+                        call.reject(encodingError.localizedDescription)
+                        return
+                    }
+                    
+                } else {
+                    call.reject("No stats found")
+                }
+            }
+        } else {
+            call.reject("Invalid sensor: \(sensor)")
         }
     }
     
