@@ -128,16 +128,16 @@ window.enableSensors = () => {
 
 window.getScores = () => {
     const scoreTypes = [SahhaScoreType.activity];
-    const startDate = document.getElementById("startDateScores").value;
-    const endDate = document.getElementById("endDateScores").value;
+    const startDate = document.getElementById("startDateInput").value;
+    const endDate = document.getElementById("endDateInput").value;
     const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
     console.log('startDateJS ' + startDateEpochMilli);
     const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
     console.log('endDateJS ' + endDateEpochMilli);
 
-    document.getElementById("scoreText").innerText = "Loading..."
+    document.getElementById("jsonText").innerText = "Loading..."
 
-    Sahha.getScores({ types: scoreTypes, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
+    Sahha.getScores({ types: scoreTypes, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
         function (response) {
             const array = JSON.parse(response.value);
             const element = array[0];
@@ -148,7 +148,7 @@ window.getScores = () => {
                 const error = "Failed to retrieve first index of json array"
                 console.log(error);
             }
-            document.getElementById("scoreText").innerText = response.value;
+            document.getElementById("jsonText").innerText = response.value;
         },
         function (error) {
             console.log(error);
@@ -159,16 +159,16 @@ window.getScores = () => {
 window.getBiomarkers = () => {
     const biomarkerCategories = [SahhaBiomarkerCategory.activity];
     const biomarkerTypes = [SahhaBiomarkerType.steps];
-    const startDate = document.getElementById("startDateBiomarkers").value;
-    const endDate = document.getElementById("endDateBiomarkers").value;
+    const startDate = document.getElementById("startDateInput").value;
+    const endDate = document.getElementById("endDateInput").value;
     const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
     console.log('startDateJS ' + startDateEpochMilli);
     const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
     console.log('endDateJS ' + endDateEpochMilli);
 
-    document.getElementById("biomarkerText").innerText = "Loading..."
+    document.getElementById("jsonText").innerText = "Loading..."
 
-    Sahha.getBiomarkers({ categories: biomarkerCategories, types: biomarkerTypes, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
+    Sahha.getBiomarkers({ categories: biomarkerCategories, types: biomarkerTypes, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
         function (response) {
             const array = JSON.parse(response.value);
             const element = array[0];
@@ -179,7 +179,7 @@ window.getBiomarkers = () => {
                 const error = "Failed to retrieve first index of json array"
                 console.log(error);
             }
-            document.getElementById("biomarkerText").innerText = response.value;
+            document.getElementById("jsonText").innerText = response.value;
         },
         function (error) {
             console.log(error);
@@ -189,16 +189,16 @@ window.getBiomarkers = () => {
 
 window.getStats = () => {
     const sensor = SahhaSensor.steps
-    const startDate = document.getElementById("startDateStats").value;
-    const endDate = document.getElementById("endDateStats").value;
+    const startDate = document.getElementById("startDateInput").value;
+    const endDate = document.getElementById("endDateInput").value;
     const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
     console.log('startDateJS ' + startDateEpochMilli);
     const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
     console.log('endDateJS ' + endDateEpochMilli);
 
-    document.getElementById("statsText").innerText = "Loading..."
+    document.getElementById("jsonText").innerText = "Loading..."
 
-    Sahha.getStats({ sensor: sensor, startDate: startDateEpochMilli, endDate: endDateEpochMilli }).then(
+    Sahha.getStats({ sensor: sensor, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
         function (response) {
             const array = JSON.parse(response.value);
             const element = array[0];
@@ -209,7 +209,37 @@ window.getStats = () => {
                 const error = "Failed to retrieve first index of json array"
                 console.log(error);
             }
-            document.getElementById("statsText").innerText = response.value;
+            document.getElementById("jsonText").innerText = response.value;
+        },
+        function (error) {
+            console.log(error);
+        }
+    )
+}
+
+window.getSamples = () => {
+    const sensor = SahhaSensor.steps
+    const startDate = document.getElementById("startDateInput").value;
+    const endDate = document.getElementById("endDateInput").value;
+    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
+    console.log('startDateJS ' + startDateEpochMilli);
+    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
+    console.log('endDateJS ' + endDateEpochMilli);
+
+    document.getElementById("jsonText").innerText = "Loading..."
+
+    Sahha.getSamples({ sensor: sensor, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
+        function (response) {
+            const array = JSON.parse(response.value);
+            const element = array[0];
+            if (element) {
+                const jsonString = JSON.stringify(element);
+                console.log(jsonString);
+            } else {
+                const error = "Failed to retrieve first index of json array"
+                console.log(error);
+            }
+            document.getElementById("jsonText").innerText = response.value;
         },
         function (error) {
             console.log(error);

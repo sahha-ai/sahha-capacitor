@@ -46,6 +46,7 @@ npx cap sync
 * [`getScores(...)`](#getscores)
 * [`getBiomarkers(...)`](#getbiomarkers)
 * [`getStats(...)`](#getstats)
+* [`getSamples(...)`](#getsamples)
 * [`openAppSettings()`](#openappsettings)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
@@ -192,12 +193,12 @@ enableSensors(options: { sensors: SahhaSensor[]; }) => Promise<{ status: SahhaSe
 ### getScores(...)
 
 ```typescript
-getScores(options: { types: SahhaScoreType[]; startDate?: number; endDate?: number; }) => Promise<{ value: string; }>
+getScores(options: { types: SahhaScoreType[]; startDateTime: number; endDateTime: number; }) => Promise<{ value: string; }>
 ```
 
-| Param         | Type                                                                            |
-| ------------- | ------------------------------------------------------------------------------- |
-| **`options`** | <code>{ types: SahhaScoreType[]; startDate?: number; endDate?: number; }</code> |
+| Param         | Type                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ types: SahhaScoreType[]; startDateTime: number; endDateTime: number; }</code> |
 
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 
@@ -207,12 +208,12 @@ getScores(options: { types: SahhaScoreType[]; startDate?: number; endDate?: numb
 ### getBiomarkers(...)
 
 ```typescript
-getBiomarkers(options: { categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDate?: number; endDate?: number; }) => Promise<{ value: string; }>
+getBiomarkers(options: { categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDateTime: number; endDateTime: number; }) => Promise<{ value: string; }>
 ```
 
-| Param         | Type                                                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **`options`** | <code>{ categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDate?: number; endDate?: number; }</code> |
+| Param         | Type                                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **`options`** | <code>{ categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDateTime: number; endDateTime: number; }</code> |
 
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 
@@ -222,12 +223,27 @@ getBiomarkers(options: { categories: SahhaBiomarkerCategory[]; types: SahhaBioma
 ### getStats(...)
 
 ```typescript
-getStats(options: { sensor: SahhaSensor; startDate: number; endDate: number; }) => Promise<{ value: string; }>
+getStats(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number; }) => Promise<{ value: string; }>
 ```
 
-| Param         | Type                                                                                                 |
-| ------------- | ---------------------------------------------------------------------------------------------------- |
-| **`options`** | <code>{ sensor: <a href="#sahhasensor">SahhaSensor</a>; startDate: number; endDate: number; }</code> |
+| Param         | Type                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| **`options`** | <code>{ sensor: <a href="#sahhasensor">SahhaSensor</a>; startDateTime: number; endDateTime: number; }</code> |
+
+**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+
+--------------------
+
+
+### getSamples(...)
+
+```typescript
+getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number; }) => Promise<{ value: string; }>
+```
+
+| Param         | Type                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| **`options`** | <code>{ sensor: <a href="#sahhasensor">SahhaSensor</a>; startDateTime: number; endDateTime: number; }</code> |
 
 **Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
 

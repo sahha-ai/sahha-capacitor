@@ -64,12 +64,12 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
 
   async getScores(options: {
     types: SahhaScoreType[];
-    startDate?: number;
-    endDate?: number;
+    startDateTime: number;
+    endDateTime: number
   }): Promise<{ value: string }> {
     console.log('getScores', options);
-    console.log('startDate', options.startDate);
-    console.log('endDate', options.endDate);
+    console.log('startDate', options.startDateTime);
+    console.log('endDate', options.endDateTime);
     return {
       value:
         '[{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-23T15:00:00+00:00","periodicity":"daily","value":"40","type":"steps","endDateTime":"2024-11-24T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-24T15:00:00+00:00","periodicity":"daily","value":"3662","type":"steps","endDateTime":"2024-11-25T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-25T15:00:00+00:00","periodicity":"daily","value":"8878","type":"steps","endDateTime":"2024-11-26T14:59:59+00:00"},{"category":"activity","unit":"count","valueType":"long","aggregation":"total","startDateTime":"2024-11-26T15:00:00+00:00","periodicity":"daily","value":"4442","type":"steps","endDateTime":"2024-11-27T14:59:59+00:00"}]',
@@ -79,23 +79,33 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
   async getBiomarkers(options: {
     categories: SahhaBiomarkerCategory[];
     types: SahhaBiomarkerType[];
-    startDate?: number;
-    endDate?: number;
+    startDateTime: number;
+    endDateTime: number
   }): Promise<{ value: string }> {
     console.log('getBiomarkers categories', options.categories);
     console.log('getBiomarkers types', options.types);
-    console.log('startDate', options.startDate);
-    console.log('endDate', options.endDate);
+    console.log('startDateTime', options.startDateTime);
+    console.log('endDateTime', options.endDateTime);
 
     return {
       value: 'PLACEHOLDER',
     };
   }
 
-  async getStats(options: { sensor: SahhaSensor; startDate: number; endDate: number }): Promise<{ value: string }> {
+  async getStats(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }> {
     console.log('getStats sensor', options.sensor);
-    console.log('startDate', options.startDate);
-    console.log('endDate', options.endDate);
+    console.log('startDateTime', options.startDateTime);
+    console.log('endDateTime', options.endDateTime);
+
+    return {
+      value: 'PLACEHOLDER',
+    };
+  }
+
+  async getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }> {
+    console.log('getSamples sensor', options.sensor);
+    console.log('startDateTime', options.startDateTime);
+    console.log('endDateTime', options.endDateTime);
 
     return {
       value: 'PLACEHOLDER',

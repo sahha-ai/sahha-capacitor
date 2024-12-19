@@ -93,46 +93,26 @@
     <div>
       <div>
         <label for="startDate">Start Date:</label>
-        <input type="date" id="startDateScores" name="startDateScores">
+        <input type="date" id="startDateInput" name="startDateInput">
       </div>
       <div>
         <label for="endDate">End Date:</label>
-        <input type="date" id="endDateScores" name="endDateScores">
-      </div>
-      <button onclick="getScores()">Get Scores</button>
-    </div>
-    <div>
-      <p id="scoreText"></p>
-    </div>
-    <hr class="solid">
-    <div>
-      <div>
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDateBiomarkers" name="startDateBiomarkers">
+        <input type="date" id="endDateInput" name="endDateInput">
       </div>
       <div>
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDateBiomarkers" name="endDateBiomarkers">
-      </div>
-      <button onclick="getBiomarkers()">Get Biomarkers</button>
-    </div>
-    <div>
-      <p id="biomarkerText"></p>
-    </div>
-    <hr class="solid">
-    <div>
-      <div>
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDateStats" name="startDateStats">
+        <button onclick="getScores()">Get Scores</button>
       </div>
       <div>
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDateStats" name="endDateStats">
+        <button onclick="getBiomarkers()">Get Biomarkers</button>
       </div>
-      <button onclick="getStats()">Get Stats</button>
-    </div>
-    <div>
-      <p id="statsText"></p>
+      <div>
+        <button onclick="getStats()">Get Stats</button>
+      </div>
+      <div>
+        <button onclick="getSamples()">Get Samples</button>
+      </div>
+        <p id="jsonText"></p>
+      </div>
     </div>
 
 

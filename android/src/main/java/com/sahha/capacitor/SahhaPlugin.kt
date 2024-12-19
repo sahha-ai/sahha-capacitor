@@ -313,13 +313,23 @@ public class SahhaPlugin : Plugin() {
     @PluginMethod
     fun getScores(call: PluginCall) {
         val types: JSArray? = call.getArray("types")
-        val startDateEpochMilli: Long? = call.getLong("startDate")
-        println("startDate provided: $startDateEpochMilli")
-        val endDateEpochMilli: Long? = call.getLong("endDate")
-        println("endDate provided: $endDateEpochMilli")
+        val startDateEpochMilli: Long? = call.getLong("startDateTime")
+        println("startDateTime provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDateTime")
+        println("endDateTime provided: $endDateEpochMilli")
 
         if (types == null) {
             call.reject("Sahha getScores types parameter is missing")
+            return
+        }
+
+        if (startDateEpochMilli == null) {
+            call.reject("Sahha getScores startDateTime parameter is missing")
+            return
+        }
+
+        if (endDateEpochMilli == null) {
+            call.reject("Sahha getScores endDateTime parameter is missing")
             return
         }
 
@@ -374,10 +384,10 @@ public class SahhaPlugin : Plugin() {
     fun getBiomarkers(call: PluginCall) {
         val categories: JSArray? = call.getArray("categories")
         val types: JSArray? = call.getArray("types")
-        val startDateEpochMilli: Long? = call.getLong("startDate")
-        println("startDate provided: $startDateEpochMilli")
-        val endDateEpochMilli: Long? = call.getLong("endDate")
-        println("endDate provided: $endDateEpochMilli")
+        val startDateEpochMilli: Long? = call.getLong("startDateTime")
+        println("startDateTime provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDateTime")
+        println("endDateTime provided: $endDateEpochMilli")
 
         if (categories == null) {
             call.reject("Sahha getBiomarkers categories parameter is missing")
@@ -386,6 +396,16 @@ public class SahhaPlugin : Plugin() {
 
         if (types == null) {
             call.reject("Sahha getBiomarkers types parameter is missing")
+            return
+        }
+
+        if (startDateEpochMilli == null) {
+            call.reject("Sahha getBiomarkers startDateTime parameter is missing")
+            return
+        }
+
+        if (endDateEpochMilli == null) {
+            call.reject("Sahha getBiomarkers endDateTime parameter is missing")
             return
         }
 
@@ -454,10 +474,10 @@ public class SahhaPlugin : Plugin() {
     fun getStats(call: PluginCall) {
         val sensor: String? = call.getString("sensor")
         println("sensor provided: $sensor")
-        val startDateEpochMilli: Long? = call.getLong("startDate")
-        println("startDate provided: $startDateEpochMilli")
-        val endDateEpochMilli: Long? = call.getLong("endDate")
-        println("endDate provided: $endDateEpochMilli")
+        val startDateEpochMilli: Long? = call.getLong("startDateTime")
+        println("startDateTime provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDateTime")
+        println("endDateTime provided: $endDateEpochMilli")
 
         if (sensor == null) {
             call.reject("Sahha getStats sensor parameter is missing")
@@ -465,12 +485,12 @@ public class SahhaPlugin : Plugin() {
         }
 
         if (startDateEpochMilli == null) {
-            call.reject("Sahha getStats startDate parameter is missing")
+            call.reject("Sahha getStats startDateTime parameter is missing")
             return
         }
 
         if (endDateEpochMilli == null) {
-            call.reject("Sahha getStats endDate parameter is missing")
+            call.reject("Sahha getStats endDateTime parameter is missing")
             return
         }
 
@@ -496,6 +516,57 @@ public class SahhaPlugin : Plugin() {
                 val statsJson = gson.toJson(value)
                 val data = JSObject()
                 data.put("value", statsJson)
+                call.resolve(data)
+            }
+        }
+    }
+
+    @PluginMethod
+    fun getSamples(call: PluginCall) {
+        val sensor: String? = call.getString("sensor")
+        println("sensor provided: $sensor")
+        val startDateEpochMilli: Long? = call.getLong("startDateTime")
+        println("startDateTime provided: $startDateEpochMilli")
+        val endDateEpochMilli: Long? = call.getLong("endDateTime")
+        println("endDateTime provided: $endDateEpochMilli")
+
+        if (sensor == null) {
+            call.reject("Sahha getSamples sensor parameter is missing")
+            return
+        }
+
+        if (startDateEpochMilli == null) {
+            call.reject("Sahha getSamples startDateTime parameter is missing")
+            return
+        }
+
+        if (endDateEpochMilli == null) {
+            call.reject("Sahha getSamples endDateTime parameter is missing")
+            return
+        }
+
+        val defaultZoneId = ZoneId.systemDefault()
+        val startInstant = Instant.ofEpochMilli(startDateEpochMilli)
+        val startLocalDateTime = LocalDateTime.ofInstant(startInstant, defaultZoneId)
+        val endInstant = Instant.ofEpochMilli(endDateEpochMilli)
+        val endLocalDateTime = LocalDateTime.ofInstant(endInstant, defaultZoneId)
+
+        Sahha.getSamples(
+            sensor = SahhaSensor.valueOf(sensor),
+            Pair(startLocalDateTime, endLocalDateTime)
+        ) { error, value ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val gson = GsonBuilder()
+                    .registerTypeAdapter(ZonedDateTime::class.java,
+                        JsonSerializer<ZonedDateTime> { src, _, _ ->
+                            JsonPrimitive(src.toString())
+                        }).create()
+
+                val samplesJson = gson.toJson(value)
+                val data = JSObject()
+                data.put("value", samplesJson)
                 call.resolve(data)
             }
         }
