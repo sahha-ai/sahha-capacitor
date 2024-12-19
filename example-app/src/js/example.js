@@ -203,13 +203,14 @@ window.getStats = () => {
             const array = JSON.parse(response.value);
             const element = array[0];
             if (element) {
-                const jsonString = JSON.stringify(element);
+                const jsonString = JSON.stringify(array, null, 6);
                 console.log(jsonString);
+                document.getElementById("jsonText").innerText = jsonString;
             } else {
                 const error = "Failed to retrieve first index of json array"
+                document.getElementById("jsonText").innerText = error
                 console.log(error);
             }
-            document.getElementById("jsonText").innerText = response.value;
         },
         function (error) {
             console.log(error);
@@ -233,13 +234,14 @@ window.getSamples = () => {
             const array = JSON.parse(response.value);
             const element = array[0];
             if (element) {
-                const jsonString = JSON.stringify(element);
-                console.log(jsonString);
+                const jsonString = JSON.stringify(array, null, 6);
+                console.log(element);
+                document.getElementById("jsonText").innerText = jsonString;
             } else {
                 const error = "Failed to retrieve first index of json array"
+                document.getElementById("jsonText").innerText = error
                 console.log(error);
             }
-            document.getElementById("jsonText").innerText = response.value;
         },
         function (error) {
             console.log(error);

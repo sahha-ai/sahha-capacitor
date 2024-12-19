@@ -163,8 +163,17 @@ export interface SahhaPlugin {
   postDemographic(options: { demographic: SahhaDemographic }): Promise<{ success: boolean }>;
   getSensorStatus(options: { sensors: SahhaSensor[] }): Promise<{ status: SahhaSensorStatus }>;
   enableSensors(options: { sensors: SahhaSensor[] }): Promise<{ status: SahhaSensorStatus }>;
-  getScores(options: { types: SahhaScoreType[]; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
-  getBiomarkers(options: { categories: SahhaBiomarkerCategory[]; types: SahhaBiomarkerType[]; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
+  getScores(options: {
+    types: SahhaScoreType[];
+    startDateTime: number;
+    endDateTime: number;
+  }): Promise<{ value: string }>;
+  getBiomarkers(options: {
+    categories: SahhaBiomarkerCategory[];
+    types: SahhaBiomarkerType[];
+    startDateTime: number;
+    endDateTime: number;
+  }): Promise<{ value: string }>;
   getStats(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
   getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
