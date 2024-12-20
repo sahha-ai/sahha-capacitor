@@ -22,8 +22,21 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "postDemographic", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getSensorStatus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "enableSensors", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "openAppSettings", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getScores", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getBiomarkers", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getStats", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getSamples", returnType: CAPPluginReturnPromise),
     ]
+    
+    private func encodeJson<T: Encodable>(_ value: T) throws -> String {
+        let jsonData = try JSONEncoder().encode(value)
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        } else {
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: [], debugDescription: "Unable to encode value"))
+        }
+    }
     
     @objc func configure(_ call: CAPPluginCall) {
         guard let settings = call.getObject("settings") else {
@@ -37,7 +50,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         }
         var sahhaSettings = SahhaSettings(environment: sahhaEnvironment)
         sahhaSettings.framework = .capacitor
-                
+        
         Sahha.configure(sahhaSettings) {
             call.resolve([
                 "success": true
@@ -96,7 +109,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-
+    
     @objc func deauthenticate(_ call: CAPPluginCall) {
         Sahha.deauthenticate { error, success in
             if let error = error {
@@ -115,14 +128,8 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 call.reject(error)
             } else if let value = value {
                 do {
-                    let jsonEncoder = JSONEncoder()
-                    jsonEncoder.outputFormatting = .prettyPrinted
-                    let jsonData = try jsonEncoder.encode(value)
-                    if let string = String(data: jsonData, encoding: .utf8) {
-                        call.resolve(["demographic": string])
-                    } else {
-                        call.reject("Sahha demographic data error")
-                    }
+                    let jsonString = try self.encodeJson(value)
+                    call.resolve(["demographic": jsonString])
                 } catch let encodingError {
                     print(encodingError)
                     call.reject(encodingError.localizedDescription)
@@ -244,6 +251,207 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             } else {
                 call.resolve(["status" : sensorStatus.rawValue])
             }
+        }
+    }
+    
+    @objc func getScores(_ call: CAPPluginCall) {
+        guard let types = call.getArray("types", String.self) else {
+            call.reject("Sahha getScores types parameter is missing")
+            return
+        }
+        
+        guard let startDateEpochMilli = call.getDouble("startDateTime") else {
+            call.reject("Sahha getScores startDateTime parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDateTime") else {
+            call.reject("Sahha getScores endDateTime parameter is missing")
+            return
+        }
+        
+        var sahhaScoreTypes = Set<SahhaScoreType>()
+        for type in types {
+            if let scoreType = SahhaScoreType(rawValue: type) {
+                sahhaScoreTypes.insert(scoreType)
+            } else {
+                call.reject("Sahha score type parameter is invalid")
+                return
+            }
+        }
+        
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+        
+        Sahha.getScores(types: sahhaScoreTypes, startDateTime: startDate, endDateTime: endDate) { error, scores in
+            if let error = error {
+                call.reject(error)
+            } else if let scores = scores {
+                call.resolve(["value": scores])
+            } else {
+                call.reject("No scores found")
+            }
+        }
+    }
+    
+    @objc func getBiomarkers(_ call: CAPPluginCall) {
+        guard let categories = call.getArray("categories", String.self) else {
+            call.reject("Sahha getBiomarkers categories parameter is missing")
+            return
+        }
+        
+        guard let types = call.getArray("types", String.self) else {
+            call.reject("Sahha getBiomarkers types parameter is missing")
+            return
+        }
+        
+        guard let startDateEpochMilli = call.getDouble("startDateTime") else {
+            call.reject("Sahha getBiomarkers startDateTime parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDateTime") else {
+            call.reject("Sahha getBiomarkers endDateTime parameter is missing")
+            return
+        }
+        
+        var sahhaBiomarkerCategories = Set<SahhaBiomarkerCategory>()
+        for category in categories {
+            if let biomarkerCategory = SahhaBiomarkerCategory(rawValue: category) {
+                sahhaBiomarkerCategories.insert(biomarkerCategory)
+            } else {
+                call.reject("Sahha biomarker category parameter is invalid")
+                return
+            }
+        }
+        
+        var sahhaBiomarkerTypes = Set<SahhaBiomarkerType>()
+        for type in types {
+            if let biomarkerType = SahhaBiomarkerType(rawValue: type) {
+                sahhaBiomarkerTypes.insert(biomarkerType)
+            } else {
+                call.reject("Sahha biomarker type parameter is invalid")
+                return
+            }
+        }
+        
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+        
+        Sahha.getBiomarkers(categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes, startDateTime: startDate, endDateTime: endDate) { error, biomarkers in
+            if let error = error {
+                call.reject(error)
+            } else if let biomarkers = biomarkers {
+                call.resolve(["value": biomarkers])
+            } else {
+                call.reject("No biomarkers found")
+            }
+        }
+    }
+    
+    @objc func getStats(_ call: CAPPluginCall) {
+        guard let sensor = call.getString("sensor") else {
+            call.reject("Sahha getStats sensor parameter is missing")
+            return
+        }
+        
+        guard let startDateEpochMilli = call.getDouble("startDateTime") else {
+            call.reject("Sahha getStats startDateTime parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDateTime") else {
+            call.reject("Sahha getStats endDateTime parameter is missing")
+            return
+        }
+        
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+        
+        if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+            Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, stats in
+                if let error = error {
+                    call.reject(error)
+                } else if !stats.isEmpty {
+                    do {
+                        let jsonEncoder = JSONEncoder()
+                        jsonEncoder.outputFormatting = .prettyPrinted
+                        let jsonData = try jsonEncoder.encode(stats)
+                        if let string = String(data: jsonData, encoding: .utf8) {
+                            call.resolve(["value": string])
+                        } else {
+                            call.reject("Encoding error")
+                        }
+                    } catch let encodingError {
+                        print(encodingError)
+                        Sahha.postError(
+                            framework: .capacitor,
+                            message: encodingError.localizedDescription,
+                            path: "SahhaCapacitor", method: "getStats",
+                            body: "jsonEncoder")
+                        call.reject(encodingError.localizedDescription)
+                        return
+                    }
+                    
+                } else {
+                    call.reject("No stats found")
+                }
+            }
+        } else {
+            call.reject("Invalid sensor: \(sensor)")
+        }
+    }
+    
+    @objc func getSamples(_ call: CAPPluginCall) {
+        guard let sensor = call.getString("sensor") else {
+            call.reject("Sahha getSamples sensor parameter is missing")
+            return
+        }
+        
+        guard let startDateEpochMilli = call.getDouble("startDateTime") else {
+            call.reject("Sahha getSamples startDate parameter is missing")
+            return
+        }
+        
+        guard let endDateEpochMilli = call.getDouble("endDateTime") else {
+            call.reject("Sahha getSamples endDate parameter is missing")
+            return
+        }
+        
+        let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
+        let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
+        
+        if let sahhaSensor = SahhaSensor(rawValue: sensor) {
+            Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, stats in
+                if let error = error {
+                    call.reject(error)
+                } else if !stats.isEmpty {
+                    do {
+                        let jsonEncoder = JSONEncoder()
+                        jsonEncoder.outputFormatting = .prettyPrinted
+                        let jsonData = try jsonEncoder.encode(stats)
+                        if let string = String(data: jsonData, encoding: .utf8) {
+                            call.resolve(["value": string])
+                        } else {
+                            call.reject("Encoding error")
+                        }
+                    } catch let encodingError {
+                        print(encodingError)
+                        Sahha.postError(
+                            framework: .capacitor,
+                            message: encodingError.localizedDescription,
+                            path: "SahhaCapacitor", method: "getSamples",
+                            body: "jsonEncoder")
+                        call.reject(encodingError.localizedDescription)
+                        return
+                    }
+                    
+                } else {
+                    call.reject("No samples found")
+                }
+            }
+        } else {
+            call.reject("Invalid sensor: \(sensor)")
         }
     }
     
