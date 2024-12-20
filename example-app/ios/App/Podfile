@@ -16,6 +16,8 @@ def capacitor_pods
   pod 'SahhaCapacitor', :path => '../../..'
 end
 
+  # pod 'Sahha', :path => '../../../../sahha-swift/'
+
 target 'App' do
   capacitor_pods
   # Add your Pods here
