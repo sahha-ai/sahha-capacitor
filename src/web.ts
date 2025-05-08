@@ -65,7 +65,7 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
   async getScores(options: {
     types: SahhaScoreType[];
     startDateTime: number;
-    endDateTime: number
+    endDateTime: number;
   }): Promise<{ value: string }> {
     console.log('getScores', options);
     console.log('startDate', options.startDateTime);
@@ -80,7 +80,7 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     categories: SahhaBiomarkerCategory[];
     types: SahhaBiomarkerType[];
     startDateTime: number;
-    endDateTime: number
+    endDateTime: number;
   }): Promise<{ value: string }> {
     console.log('getBiomarkers categories', options.categories);
     console.log('getBiomarkers types', options.types);
@@ -92,7 +92,11 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     };
   }
 
-  async getStats(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }> {
+  async getStats(options: {
+    sensor: SahhaSensor;
+    startDateTime: number;
+    endDateTime: number;
+  }): Promise<{ value: string }> {
     console.log('getStats sensor', options.sensor);
     console.log('startDateTime', options.startDateTime);
     console.log('endDateTime', options.endDateTime);
@@ -102,7 +106,11 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     };
   }
 
-  async getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }> {
+  async getSamples(options: {
+    sensor: SahhaSensor;
+    startDateTime: number;
+    endDateTime: number;
+  }): Promise<{ value: string }> {
     console.log('getSamples sensor', options.sensor);
     console.log('startDateTime', options.startDateTime);
     console.log('endDateTime', options.endDateTime);
@@ -110,6 +118,11 @@ export class SahhaWeb extends WebPlugin implements SahhaPlugin {
     return {
       value: 'PLACEHOLDER',
     };
+  }
+
+  async postSensorData(): Promise<void> {
+    console.log('postSensorData');
+    return;
   }
 
   async openAppSettings(): Promise<void> {

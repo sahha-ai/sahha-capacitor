@@ -2,7 +2,11 @@ package com.getcapacitor;
 
 import static org.junit.Assert.*;
 
+import com.sahha.capacitor.SahhaPluginKt;
+
 import org.junit.Test;
+
+import sdk.sahha.android.source.Sahha;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
