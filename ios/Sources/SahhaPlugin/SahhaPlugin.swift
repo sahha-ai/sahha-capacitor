@@ -455,6 +455,10 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
     
+    @objc func postSensorData(_ call: CAPPluginCall) {
+        Sahha.postSensorData()
+    }
+    
     @objc func openAppSettings(_ call: CAPPluginCall) {
         Sahha.openAppSettings()
     }

@@ -132,6 +132,7 @@ our [setup guide](https://docs.sahha.ai/docs/data-flow/sdk/setup#minimum-require
 * [`getStats(...)`](#getstats)
 * [`getSamples(...)`](#getsamples)
 * [`openAppSettings()`](#openappsettings)
+* [`postSensorData()`](#postsensordata)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -338,6 +339,15 @@ getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: n
 
 ```typescript
 openAppSettings() => Promise<void>
+```
+
+--------------------
+
+
+### postSensorData()
+
+```typescript
+postSensorData() => Promise<void>
 ```
 
 --------------------

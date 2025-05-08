@@ -27,6 +27,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+private const val TAG = "SahhaPlugin"
 
 @CapacitorPlugin(name = "Sahha")
 public class SahhaPlugin : Plugin() {
@@ -570,6 +571,12 @@ public class SahhaPlugin : Plugin() {
                 call.resolve(data)
             }
         }
+    }
+
+    @Deprecated(message = "postSensorData is only supported on iOS", level = DeprecationLevel.WARNING)
+    @PluginMethod
+    fun postSensorData(call: PluginCall) {
+        Log.w(TAG, "postSensorData is only supported on iOS")
     }
 
     @PluginMethod

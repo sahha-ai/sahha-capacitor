@@ -190,4 +190,9 @@ export interface SahhaPlugin {
   getStats(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
   getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
+  /**
+   * @remarks
+   * Only available on **iOS**. On Android, this method is a no-op.
+   */
+  postSensorData(): Promise<void>;
 }
