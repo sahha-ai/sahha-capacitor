@@ -256,7 +256,11 @@ function parseLocalDate(inputValue) {
     const date = new Date(year, month - 1, day, 0, 0, 0, 0);
   
     return date;
-  }
+}
+
+window.postSensorData = () => {
+    Sahha.postSensorData()
+}
 
 window.openAppSettings = () => {
     Sahha.openAppSettings()
