@@ -2,9 +2,6 @@ package com.getcapacitor.myapp;
 
 import static org.junit.Assert.*;
 
-import com.sahha.capacitor.SahhaPlugin;
-import com.sahha.capacitor.SahhaPluginKt;
-
 import org.junit.Test;
 
 /**
