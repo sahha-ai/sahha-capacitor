@@ -450,6 +450,7 @@ postSensorData() => Promise<void>
 | **`walking_asymmetry_percentage`**      | <code>'walking_asymmetry_percentage'</code>      |
 | **`walking_double_support_percentage`** | <code>'walking_double_support_percentage'</code> |
 | **`walking_step_length`**               | <code>'walking_step_length'</code>               |
+| **`energy_consumed`**                   | <code>'energy_consumed'</code>                   |
 
 
 #### SahhaSensorStatus
