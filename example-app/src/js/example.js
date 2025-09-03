@@ -100,7 +100,7 @@ window.getDemographic = () => {
     )
 }
 
-let sensors = [SahhaSensor.sleep, SahhaSensor.body_fat, SahhaSensor.steps, SahhaSensor.floors_climbed, SahhaSensor.active_energy_burned, SahhaSensor.heart_rate, SahhaSensor.energy_consumed];
+let sensors = [SahhaSensor.sleep, SahhaSensor.body_fat, SahhaSensor.steps, SahhaSensor.floors_climbed, SahhaSensor.active_energy_burned, SahhaSensor.heart_rate, SahhaSensor.blood_pressure_diastolic];
 
 window.getSensorStatus = () => {
     Sahha.getSensorStatus({ sensors: sensors }).then(
@@ -188,7 +188,7 @@ window.getBiomarkers = () => {
 }
 
 window.getStats = () => {
-    const sensor = SahhaSensor.steps
+    const sensor = SahhaSensor.blood_pressure_systolic
     const startDate = document.getElementById("startDateInput").value;
     const endDate = document.getElementById("endDateInput").value;
     const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;

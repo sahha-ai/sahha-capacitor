@@ -2,6 +2,7 @@
   "appId": "demo.sahha.capacitor",
   "appName": "Sahha Demo",
   "webDir": "dist",
+  "loggingBehavior": "debug",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 0
