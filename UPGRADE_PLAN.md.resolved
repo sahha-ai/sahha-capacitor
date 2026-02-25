@@ -1,0 +1,84 @@
+# Capacitor Plugin Upgrade Plan: `sahha-capacitor`
+
+## Overview
+This document outlines the upgrade path for the `sahha-capacitor` plugin. The baseline build succeeds without any current build blockers. This outline provides targets for upgrading Capacitor Core as well as the underlying Sahha native SDKs.
+
+## Version Targets
+
+### Capacitor
+| Component | Current Version | Target Version |
+| :--- | :--- | :--- |
+| `@capacitor/core` & plugins | `^6.0.0` | `^8.0.0` (Latest Stable) |
+| `@capacitor/ios` | `^6.0.0` | `^8.0.0` |
+| `@capacitor/android` | `^6.0.0` | `^8.0.0` |
+
+### Android (Native)
+| Component | Current Version | Target Version |
+| :--- | :--- | :--- |
+| `ai.sahha:sahha-android` | `1.2.0` | `1.2.1` |
+| `compileSdk` | `34` | `35` (Req. for Cap 7/8) |
+| `targetSdk` | `34` | `35` (Req. for Cap 7/8) |
+| `minSdk` | `26` | `26` |
+| Gradle Plugin (AGP) | `8.2.1` | `8.7.2` (Req. for Cap 8) |
+| Kotlin | `1.9.0` | `1.9.25` or `2.0+` |
+
+### iOS (Native)
+| Component | Current Version | Target Version |
+| :--- | :--- | :--- |
+| `Sahha` (CocoaPods) | `1.2.5` | `1.3.5` |
+| iOS Deployment Target | `14.0` | `14.0` (or `15.0` for Cap 8) |
+| Swift Version | `5.1` | `5.9` (Recommended) |
+
+---
+
+## Expected Breaking Changes
+
+1.  **Capacitor 6 -> 8 Requirements**:
+    *   **Android**: Upgrading to Capacitor 8 requires `compileSdk` and `targetSdk` to be bumped to `35`. It also requires AGP 8.7.2+ and updating the Kotlin plugin version.
+    *   **iOS**: Capacitor 8 heavily pushes for SPM (Swift Package Manager). While CocoaPods is still supported, the iOS deployment target may implicitly need bumping to 15.0 depending on Xcode 16 requirements.
+2.  **Sahha SDKs**:
+    *   The jump from `1.2.5` to `1.3.5` on iOS might include internal API updates. Thorough testing is required to verify the SDK wrappers in `ios/Sources/SahhaPlugin.swift` and `android/src/main/java/com/sahha/capacitor/SahhaPlugin.java`.
+
+---
+
+## Upgrade Checklist
+
+### 1. Preparation & Tooling
+- [ ] Ensure Xcode 16+ is installed (for iOS 18/SDK 35 support).
+- [ ] Ensure Android Studio Ladybug (or latest) is installed.
+
+### 2. Dependency Updates ([package.json](file:///Users/mac/Projects/capacitor-plugins/sahha-capacitor/package.json))
+- [ ] Update `@capacitor/core`, `@capacitor/ios`, and `@capacitor/android` to `^8.0.0`.
+- [ ] Update `devDependencies` (e.g. `typescript`, `@ionic/eslint-config`) to their latest compatible versions.
+- [ ] Run `npm install` to apply updates.
+
+### 3. Android Updates
+- [ ] In [android/build.gradle](file:///Users/mac/Projects/capacitor-plugins/sahha-capacitor/android/build.gradle), update `ai.sahha:sahha-android:1.2.0` to `1.2.1`.
+- [ ] In [android/build.gradle](file:///Users/mac/Projects/capacitor-plugins/sahha-capacitor/android/build.gradle), update `ext.compileSdkVersion` and `ext.targetSdkVersion` to `35`.
+- [ ] If applicable, update Android Gradle Plugin to `8.7.2` and Kotlin to `1.9.25+` via [build.gradle](file:///Users/mac/Projects/capacitor-plugins/sahha-capacitor/android/build.gradle) and `gradle-wrapper.properties`.
+
+### 4. iOS Updates
+- [ ] In [SahhaCapacitor.podspec](file:///Users/mac/Projects/capacitor-plugins/sahha-capacitor/SahhaCapacitor.podspec), update `s.dependency 'Sahha', '1.2.5'` to `1.3.5`.
+- [ ] If needed by Capacitor 8, update `s.ios.deployment_target` to `15.0`.
+- [ ] In [Package.swift](file:///Users/mac/Projects/capacitor-plugins/sahha-capacitor/Package.swift) (if used), update the Sahha dependency URL and version requirement to `1.3.5`.
+- [ ] Under `ios/`, run `pod repo update` and `pod install` (if using an example app workspace to test).
+
+### 5. Plugin Wrapper Code Verification
+- [ ] Re-run `npm run build`.
+- [ ] Address any compilation errors in Swift or Java/Kotlin triggered by SDK updates or Capacitor v8 API changes.
+
+---
+
+## Smoke Test Checklist (Definition of Done)
+
+Once the code is upgraded, use the `example-app` (or a blank test app) for validation:
+
+- [ ] **Build Success:** `npm run build` succeeds locally without errors.
+- [ ] **Android Build:** The plugin compiles successfully in Android Studio without deprecation/compatibility errors.
+- [ ] **iOS Build:** The plugin compiles successfully in Xcode.
+- [ ] **Runtime Initialization:** The test app launches on both an Android Emulator and iOS Simulator.
+- [ ] **Sahha Configure:** Calling `Sahha.configure(...)` successfully initializes the Sahha SDK without crashing.
+- [ ] **Core Functionality:** A basic API call (e.g., `Sahha.authenticate` or checking permissions) correctly reaches the native SDK and returns a valid callback.
+
+## Current Build Blockers
+*   **None.** The baseline build (`npm i && npm run build`) currently completes successfully.
