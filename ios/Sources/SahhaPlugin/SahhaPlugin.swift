@@ -27,6 +27,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getBiomarkers", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getStats", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getSamples", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "postSensorData", returnType: CAPPluginReturnPromise),
     ]
     
     private func encodeJson<T: Encodable>(_ value: T) throws -> String {
@@ -122,6 +123,14 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
     
+    @objc func getProfileToken(_ call: CAPPluginCall) {
+        if let token = Sahha.profileToken {
+            call.resolve(["profileToken": token])
+        } else {
+            call.reject("No profile token found")
+        }
+    }
+    
     @objc func getDemographic(_ call: CAPPluginCall) {
         Sahha.getDemographic { error, value in
             if let error = error {
@@ -148,53 +157,8 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         
         var sahhaDemographic = SahhaDemographic()
         
-        if let ageNumber = demographic["age"] as? NSNumber {
-            let age = ageNumber.intValue
-            sahhaDemographic.age = age
-        }
-        
         if let gender = demographic["gender"] as? String {
             sahhaDemographic.gender = gender
-        }
-        
-        if let country = demographic["country"] as? String {
-            sahhaDemographic.country = country
-        }
-        
-        if let birthCountry = demographic["birthCountry"] as? String {
-            sahhaDemographic.birthCountry = birthCountry
-        }
-        
-        if let ethnicity = demographic["ethnicity"] as? String {
-            sahhaDemographic.ethnicity = ethnicity
-        }
-        
-        if let occupation = demographic["occupation"] as? String {
-            sahhaDemographic.occupation = occupation
-        }
-        
-        if let industry = demographic["industry"] as? String {
-            sahhaDemographic.industry = industry
-        }
-        
-        if let incomeRange = demographic["incomeRange"] as? String {
-            sahhaDemographic.incomeRange = incomeRange
-        }
-        
-        if let education = demographic["education"] as? String {
-            sahhaDemographic.education = education
-        }
-        
-        if let relationship = demographic["relationship"] as? String {
-            sahhaDemographic.relationship = relationship
-        }
-        
-        if let locale = demographic["locale"] as? String {
-            sahhaDemographic.locale = locale
-        }
-        
-        if let livingArrangement = demographic["livingArrangement"] as? String {
-            sahhaDemographic.livingArrangement = livingArrangement
         }
         
         if let birthDate = demographic["birthDate"] as? String {
@@ -287,7 +251,18 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             if let error = error {
                 call.reject(error)
             } else if let scores = scores {
-                call.resolve(["value": scores])
+                do {
+                    let jsonString = try self.encodeJson(scores)
+                    call.resolve(["value": jsonString])
+                } catch let encodingError {
+                    print(encodingError)
+                    Sahha.postError(
+                            framework: .capacitor,
+                            message: encodingError.localizedDescription,
+                            path: "SahhaCapacitor", method: "getScores",
+                            body: "jsonEncoder")
+                    call.reject(encodingError.localizedDescription)
+                }
             } else {
                 call.reject("No scores found")
             }
@@ -342,7 +317,18 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             if let error = error {
                 call.reject(error)
             } else if let biomarkers = biomarkers {
-                call.resolve(["value": biomarkers])
+                do {
+                    let jsonString = try self.encodeJson(biomarkers)
+                    call.resolve(["value": jsonString])
+                } catch let encodingError {
+                    print(encodingError)
+                    Sahha.postError(
+                            framework: .capacitor,
+                            message: encodingError.localizedDescription,
+                            path: "SahhaCapacitor", method: "getBiomarkers",
+                            body: "jsonEncoder")
+                    call.reject(encodingError.localizedDescription)
+                }
             } else {
                 call.reject("No biomarkers found")
             }
@@ -456,10 +442,13 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
     }
     
     @objc func postSensorData(_ call: CAPPluginCall) {
-        Sahha.postSensorData()
+        Sahha.postSensorData { _ in
+            call.resolve()
+        }
     }
     
     @objc func openAppSettings(_ call: CAPPluginCall) {
         Sahha.openAppSettings()
+        call.resolve()
     }
 }
