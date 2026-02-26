@@ -142,6 +142,31 @@ public class SahhaPlugin : Plugin() {
     }
 
     @PluginMethod
+    fun deauthenticate(call: PluginCall) {
+        Sahha.deauthenticate() { error, success ->
+            if (error != null) {
+                call.reject(error)
+            } else {
+                val data = JSObject()
+                data.put("success", success)
+                call.resolve(data)
+            }
+        }
+    }
+
+    @PluginMethod
+    fun getProfileToken(call: PluginCall) {
+        val profileToken = Sahha.profileToken
+        if (profileToken != null) {
+            val data = JSObject()
+            data.put("profileToken", profileToken)
+            call.resolve(data)
+        } else {
+            call.reject("No profile token found")
+        }
+    }
+
+    @PluginMethod
     fun authenticateToken(call: PluginCall) {
 
         var profileToken: String? = call.getString("profileToken");
@@ -363,8 +388,15 @@ public class SahhaPlugin : Plugin() {
                 if (error != null) {
                     call.reject(error)
                 } else {
+                    val gson = GsonBuilder()
+                        .registerTypeAdapter(ZonedDateTime::class.java,
+                            JsonSerializer<ZonedDateTime> { src, _, _ ->
+                                JsonPrimitive(src.toString())
+                            }).create()
+                    val valueJson = gson.toJson(value)
+                    
                     val data = JSObject()
-                    data.put("value", value)
+                    data.put("value", valueJson)
                     call.resolve(data)
                 }
             }
@@ -373,8 +405,15 @@ public class SahhaPlugin : Plugin() {
                 if (error != null) {
                     call.reject(error)
                 } else {
+                    val gson = GsonBuilder()
+                        .registerTypeAdapter(ZonedDateTime::class.java,
+                            JsonSerializer<ZonedDateTime> { src, _, _ ->
+                                JsonPrimitive(src.toString())
+                            }).create()
+                    val valueJson = gson.toJson(value)
+                    
                     val data = JSObject()
-                    data.put("value", value)
+                    data.put("value", valueJson)
                     call.resolve(data)
                 }
             }
@@ -453,8 +492,15 @@ public class SahhaPlugin : Plugin() {
                 if (error != null) {
                     call.reject(error)
                 } else {
+                    val gson = GsonBuilder()
+                        .registerTypeAdapter(ZonedDateTime::class.java,
+                            JsonSerializer<ZonedDateTime> { src, _, _ ->
+                                JsonPrimitive(src.toString())
+                            }).create()
+                    val valueJson = gson.toJson(value)
+                    
                     val data = JSObject()
-                    data.put("value", value)
+                    data.put("value", valueJson)
                     call.resolve(data)
                 }
             }
@@ -463,8 +509,15 @@ public class SahhaPlugin : Plugin() {
                 if (error != null) {
                     call.reject(error)
                 } else {
+                    val gson = GsonBuilder()
+                        .registerTypeAdapter(ZonedDateTime::class.java,
+                            JsonSerializer<ZonedDateTime> { src, _, _ ->
+                                JsonPrimitive(src.toString())
+                            }).create()
+                    val valueJson = gson.toJson(value)
+                    
                     val data = JSObject()
-                    data.put("value", value)
+                    data.put("value", valueJson)
                     call.resolve(data)
                 }
             }
@@ -577,10 +630,12 @@ public class SahhaPlugin : Plugin() {
     @PluginMethod
     fun postSensorData(call: PluginCall) {
         Log.w(TAG, "postSensorData is only supported on iOS")
+        call.resolve()
     }
 
     @PluginMethod
     fun openAppSettings(call: PluginCall) {
         Sahha.openAppSettings(context)
+        call.resolve()
     }
 }
