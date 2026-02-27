@@ -3,123 +3,319 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Example Capacitor App</title>
+  <title>Sahha SDK Demo</title>
   <meta name="viewport"
     content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="format-detection" content="telephone=no" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    hr.solid {
-      border-top: 2px solid #000;
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
     }
 
-    div {
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
       padding: 20px;
-      text-align: left;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
     }
 
-    input {
-      margin-top: 10px;
+    main {
+      max-width: 600px;
+      width: 100%;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 32px;
+      background: linear-gradient(to right, #818cf8, #c084fc);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+
+    .field-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: all 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
 
     button {
-      padding: 10px;
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+
+    #jsonText {
+      background: #0f172a;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #10b981;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-top: 24px;
+      border: 1px solid var(--border);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .inline-field {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .inline-field label {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+
+    .inline-field input {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-weight: 600;
+      color: #10b981;
+      box-shadow: none;
+      width: auto;
     }
   </style>
 </head>
 
 <body>
   <main>
-    <h1>Sahha Capacitor SDK Demo</h1>
-    <div>
-      App Id:
-      <br />
-      <input type="text" id="appId" name="appId" value="" />
-    </div>
-    <div>
-      App Secret:
-      <br />
-      <input type="text" id="appSecret" name="appSecret" value="" />
-    </div>
-    <div>
-      External Id:
-      <br />
-      <input type="text" id="externalId" name="externalId" value="" />
-    </div>
-    <div>
-      Authenticated:
-      <br />
-      <input type="text" id="isAuthenticated" name="isAuthenticated" value="false" disabled />
-      <br />
-    </div>
-    <div>
-      <button onclick="authenticate()">Authenticate</button>
-    </div>
-    <hr class="solid">
-    <div>
-      Gender:
-      <br />
-      <select name="gender" id="gender">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Gender Diverse">Gender Diverse</option>
+    <h1>Sahha SDK Demo</h1>
+
+    <div class="field-group">
+      <label for="environment">Environment</label>
+      <select id="environment" onchange="configure()">
+        <option value="sandbox">Sandbox</option>
+        <option value="production">Production</option>
+        <option value="development">Development</option>
       </select>
     </div>
-    <div>
-      Age:
-      <br />
-      <input type="text" id="age" name="age" value="" />
+
+    <div class="field-group">
+      <label for="appId">App Id</label>
+      <input type="text" id="appId" />
     </div>
-    <div>
+
+    <div class="field-group">
+      <label for="appSecret">App Secret</label>
+      <input type="password" id="appSecret" />
+    </div>
+
+    <div class="field-group">
+      <label for="externalId">External Id</label>
+      <input type="text" id="externalId" />
+    </div>
+
+    <div class="inline-field">
+      <label>Authenticated:</label>
+      <input type="text" id="isAuthenticated" value="false" readonly />
+    </div>
+
+    <button onclick="authenticate()">Authenticate</button>
+
+    <hr>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Gender Diverse">Gender Diverse</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="25" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="birthDate">Birth Date</label>
+        <input type="date" id="birthDate" />
+      </div>
+      <div class="field-group">
+        <label for="country">Country</label>
+        <input type="text" id="country" placeholder="USA" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="birthCountry">Birth Country</label>
+        <input type="text" id="birthCountry" placeholder="USA" />
+      </div>
+      <div class="field-group">
+        <label for="ethnicity">Ethnicity</label>
+        <input type="text" id="ethnicity" placeholder="Asian" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="occupation">Occupation</label>
+        <input type="text" id="occupation" placeholder="Engineer" />
+      </div>
+      <div class="field-group">
+        <label for="industry">Industry</label>
+        <input type="text" id="industry" placeholder="Technology" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="incomeRange">Income Range</label>
+        <input type="text" id="incomeRange" placeholder="$50k - $100k" />
+      </div>
+      <div class="field-group">
+        <label for="education">Education</label>
+        <input type="text" id="education" placeholder="Bachelor" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="relationship">Relationship</label>
+        <input type="text" id="relationship" placeholder="Single" />
+      </div>
+      <div class="field-group">
+        <label for="locale">Locale</label>
+        <input type="text" id="locale" placeholder="en-US" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label for="livingArrangement">Living Arrangement</label>
+      <input type="text" id="livingArrangement" placeholder="Alone" />
+    </div>
+
+    <div class="row">
       <button onclick="postDemographic()">Post Demographic</button>
-    </div>
-    <div>
       <button onclick="getDemographic()">Get Demographic</button>
     </div>
-    <hr class="solid">
-    <div>
-      Sensors Enabled:
-      <br />
-      <input type="text" id="isSensorsEnabled" name="isSensorsEnabled" value="pending" disabled />
-      <br />
+
+    <hr>
+
+    <div class="inline-field">
+      <label>Sensors Status:</label>
+      <input type="text" id="isSensorsEnabled" value="pending" readonly />
     </div>
-    <div>
-      <button onclick="enableSensors()">Enable Sensors</button>
+
+    <button onclick="enableSensors()">Enable Sensors</button>
+
+    <hr>
+
+    <div class="row">
+      <button onclick="openAppSettings()">App Settings</button>
+      <button onclick="postSensorData()">Test Post</button>
     </div>
-    <hr class="solid">
-    <div>
-      <button onclick="openAppSettings()">Open App Settings</button>
-    </div>
-    <hr class="solid">
-    <div>
-      <button onclick="postSensorData()">Test Post Sensor Data</button>
-    </div>
-    <hr class="solid">
-    <div>
-      <div>
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDateInput" name="startDateInput">
+
+    <hr>
+
+    <div class="row">
+      <div class="field-group">
+        <label for="startDateInput">Start Date</label>
+        <input type="date" id="startDateInput">
       </div>
-      <div>
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDateInput" name="endDateInput">
-      </div>
-      <div>
-        <button onclick="getScores()">Get Scores</button>
-      </div>
-      <div>
-        <button onclick="getBiomarkers()">Get Biomarkers</button>
-      </div>
-      <div>
-        <button onclick="getStats()">Get Stats</button>
-      </div>
-      <div>
-        <button onclick="getSamples()">Get Samples</button>
-      </div>
-        <p id="jsonText"></p>
+      <div class="field-group">
+        <label for="endDateInput">End Date</label>
+        <input type="date" id="endDateInput">
       </div>
     </div>
 
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 8px;">
+      <button onclick="getScores()">Scores</button>
+      <button onclick="getBiomarkers()">Biomarkers</button>
+      <button onclick="getStats()">Stats</button>
+      <button onclick="getSamples()">Samples</button>
+    </div>
 
+    <p id="jsonText">Ready</p>
   </main>
   <script src="./js/example.js" type="module"></script>
 </body>
