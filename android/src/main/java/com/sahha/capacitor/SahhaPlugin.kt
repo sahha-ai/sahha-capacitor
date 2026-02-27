@@ -48,11 +48,17 @@ public class SahhaPlugin : Plugin() {
             return
         }
 
+        Log.d(TAG, "Sahha.configure environment: $environment")
         val sahhaEnvironment: SahhaEnvironment
         try {
-            sahhaEnvironment = SahhaEnvironment.valueOf(environment)
-        } catch (e: IllegalArgumentException) {
-            call.reject("Sahha configure settings environment parameter is not valid")
+            val availableEnvironments = SahhaEnvironment.entries
+            sahhaEnvironment = availableEnvironments.find { it.name.equals(environment, ignoreCase = true) }
+                ?: SahhaEnvironment.valueOf(environment)
+            Log.d(TAG, "Sahha.configure resolved to: ${sahhaEnvironment.name}")
+        } catch (e: Exception) {
+            val available = SahhaEnvironment.entries.joinToString(", ") { it.name }
+            Log.e(TAG, "Invalid environment: $environment. Available: $available", e)
+            call.reject("Sahha configure settings environment parameter is not valid. Available: $available")
             return
         }
 
@@ -129,6 +135,7 @@ public class SahhaPlugin : Plugin() {
             return
         }
 
+        Log.d(TAG, "Sahha.authenticate starting for appId: $appId, externalId: $externalId")
         Sahha.authenticate(appId, appSecret, externalId)
         { error, success ->
             if (error != null) {
