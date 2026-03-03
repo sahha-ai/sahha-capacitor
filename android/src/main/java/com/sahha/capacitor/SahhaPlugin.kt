@@ -566,7 +566,13 @@ public class SahhaPlugin : Plugin() {
             Pair(startLocalDateTime, endLocalDateTime)
         ) { error, value ->
             if (error != null) {
-                call.reject(error)
+                if (error.contains("found", ignoreCase = true)) {
+                    val data = JSObject()
+                    data.put("value", "[]")
+                    call.resolve(data)
+                } else {
+                    call.reject(error)
+                }
             } else {
                 val gson = GsonBuilder()
                     .registerTypeAdapter(ZonedDateTime::class.java,
@@ -617,7 +623,13 @@ public class SahhaPlugin : Plugin() {
             Pair(startLocalDateTime, endLocalDateTime)
         ) { error, value ->
             if (error != null) {
-                call.reject(error)
+                if (error.contains("found", ignoreCase = true)) {
+                    val data = JSObject()
+                    data.put("value", "[]")
+                    call.resolve(data)
+                } else {
+                    call.reject(error)
+                }
             } else {
                 val gson = GsonBuilder()
                     .registerTypeAdapter(ZonedDateTime::class.java,

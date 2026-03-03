@@ -357,8 +357,12 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         if let sahhaSensor = SahhaSensor(rawValue: sensor) {
             Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, stats in
                 if let error = error {
-                    call.reject(error)
-                } else if !stats.isEmpty {
+                    if error.lowercased().contains("found") {
+                        call.resolve(["value": "[]"])
+                    } else {
+                        call.reject(error)
+                    }
+                } else {
                     do {
                         let jsonEncoder = JSONEncoder()
                         jsonEncoder.outputFormatting = .prettyPrinted
@@ -378,9 +382,6 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                         call.reject(encodingError.localizedDescription)
                         return
                     }
-                    
-                } else {
-                    call.reject("No stats found")
                 }
             }
         } else {
@@ -410,8 +411,12 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         if let sahhaSensor = SahhaSensor(rawValue: sensor) {
             Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, stats in
                 if let error = error {
-                    call.reject(error)
-                } else if !stats.isEmpty {
+                    if error.lowercased().contains("found") {
+                        call.resolve(["value": "[]"])
+                    } else {
+                        call.reject(error)
+                    }
+                } else {
                     do {
                         let jsonEncoder = JSONEncoder()
                         jsonEncoder.outputFormatting = .prettyPrinted
@@ -431,9 +436,6 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                         call.reject(encodingError.localizedDescription)
                         return
                     }
-                    
-                } else {
-                    call.reject("No samples found")
                 }
             }
         } else {
