@@ -39,7 +39,7 @@ window.configure = () => {
         },
         function (error) {
             console.log('Sahha.configure error:', error);
-            document.getElementById("jsonText").innerText = "Configuration Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Configuration Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -53,7 +53,7 @@ window.isAuthenticated = () => {
         },
         function (error) {
             console.log('Sahha.isAuthenticated error:', error);
-            document.getElementById("jsonText").innerText = "Is Authenticated Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Is Authenticated Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -77,7 +77,7 @@ window.authenticate = () => {
         },
         function (error) {
             console.log('Sahha.authenticate error:', error);
-            document.getElementById("jsonText").innerText = "Authentication Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Authentication Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -105,7 +105,7 @@ window.postDemographic = () => {
         },
         function (error) {
             console.log('Sahha.postDemographic error:', error);
-            document.getElementById("jsonText").innerText = "Post Demographic Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Post Demographic Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -131,7 +131,7 @@ window.getDemographic = () => {
         },
         function (error) {
             console.log('Sahha.getDemographic error:', error);
-            document.getElementById("jsonText").innerText = "Get Demographic Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Get Demographic Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -142,12 +142,18 @@ window.getSensorStatus = () => {
     Sahha.getSensorStatus({ sensors: sensors }).then(
         function (response) {
             console.log('Sahha.getSensorStatus success:', response);
-            const statusText = SahhaSensorStatus[response.status] || 'Unknown';
+            let statusText = 'Unknown';
+            if (typeof response.status === 'number') {
+                statusText = SahhaSensorStatus[response.status] || 'Unknown';
+            } else if (typeof response.status === 'string') {
+                statusText = response.status;
+            }
+            if (typeof statusText !== 'string') statusText = 'Unknown';
             document.getElementById("isSensorsEnabled").value = statusText.charAt(0).toUpperCase() + statusText.slice(1);
         },
         function (error) {
             console.log('Sahha.getSensorStatus error:', error);
-            document.getElementById("jsonText").innerText = "Sensor Status Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Sensor Status Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -156,12 +162,18 @@ window.enableSensors = () => {
     Sahha.enableSensors({ sensors: sensors }).then(
         function (response) {
             console.log('Sahha.enableSensors success:', response);
-            const statusText = SahhaSensorStatus[response.status] || 'Unknown';
+            let statusText = 'Unknown';
+            if (typeof response.status === 'number') {
+                statusText = SahhaSensorStatus[response.status] || 'Unknown';
+            } else if (typeof response.status === 'string') {
+                statusText = response.status;
+            }
+            if (typeof statusText !== 'string') statusText = 'Unknown';
             document.getElementById("isSensorsEnabled").value = statusText.charAt(0).toUpperCase() + statusText.slice(1);
         },
         function (error) {
             console.log('Sahha.enableSensors error:', error);
-            document.getElementById("jsonText").innerText = "Enable Sensors Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Enable Sensors Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -183,7 +195,7 @@ window.getScores = () => {
         },
         function (error) {
             console.log('Sahha.getScores error:', error);
-            document.getElementById("jsonText").innerText = "Get Scores Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Get Scores Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -206,7 +218,7 @@ window.getBiomarkers = () => {
         },
         function (error) {
             console.log('Sahha.getBiomarkers error:', error);
-            document.getElementById("jsonText").innerText = "Get Biomarkers Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Get Biomarkers Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -228,7 +240,7 @@ window.getStats = () => {
         },
         function (error) {
             console.log('Sahha.getStats error:', error);
-            document.getElementById("jsonText").innerText = "Get Stats Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Get Stats Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -250,7 +262,7 @@ window.getSamples = () => {
         },
         function (error) {
             console.log('Sahha.getSamples error:', error);
-            document.getElementById("jsonText").innerText = "Get Samples Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Get Samples Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -272,7 +284,7 @@ window.postSensorData = () => {
         },
         function (error) {
             console.log('Sahha.postSensorData error:', error);
-            document.getElementById("jsonText").innerText = "Post Sensor Data Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Post Sensor Data Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
@@ -285,7 +297,7 @@ window.openAppSettings = () => {
         },
         function (error) {
             console.log('Sahha.openAppSettings error:', error);
-            document.getElementById("jsonText").innerText = "Open App Settings Error: " + JSON.stringify(error);
+            document.getElementById("jsonText").innerText = "Open App Settings Error: " + (error.message || error.errorMessage || JSON.stringify(error));
         }
     )
 }
