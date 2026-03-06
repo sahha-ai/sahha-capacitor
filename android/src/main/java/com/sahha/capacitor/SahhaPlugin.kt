@@ -1,5 +1,16 @@
 package com.sahha.capacitor;
 
+import ai.sahha.api.Sahha
+import ai.sahha.api.biomarkers.SahhaBiomarkerCategory
+import ai.sahha.api.biomarkers.SahhaBiomarkerType
+import ai.sahha.api.demographic.SahhaDemographic
+import ai.sahha.api.notifications.SahhaNotificationConfiguration
+import ai.sahha.api.score.SahhaScoreType
+import ai.sahha.api.sensors.SahhaSensor
+import ai.sahha.api.settings.SahhaEnvironment
+import ai.sahha.api.settings.SahhaFramework
+import ai.sahha.api.settings.SahhaSettings
+import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
 import com.getcapacitor.JSArray
@@ -11,17 +22,6 @@ import com.getcapacitor.annotation.CapacitorPlugin
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
-import sdk.sahha.android.source.Sahha
-import sdk.sahha.android.source.SahhaBiomarkerCategory
-import sdk.sahha.android.source.SahhaBiomarkerType
-import sdk.sahha.android.source.SahhaConverterUtility
-import sdk.sahha.android.source.SahhaDemographic
-import sdk.sahha.android.source.SahhaEnvironment
-import sdk.sahha.android.source.SahhaFramework
-import sdk.sahha.android.source.SahhaNotificationConfiguration
-import sdk.sahha.android.source.SahhaScoreType
-import sdk.sahha.android.source.SahhaSensor
-import sdk.sahha.android.source.SahhaSettings
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -53,7 +53,7 @@ public class SahhaPlugin : Plugin() {
         try {
             val availableEnvironments = SahhaEnvironment.entries
             sahhaEnvironment = availableEnvironments.find { it.name.equals(environment, ignoreCase = true) }
-                ?: SahhaEnvironment.valueOf(environment)
+                ?: SahhaEnvironment.valueOf(environment.uppercase())
             Log.d(TAG, "Sahha.configure resolved to: ${sahhaEnvironment.name}")
         } catch (e: Exception) {
             val available = SahhaEnvironment.entries.joinToString(", ") { it.name }
@@ -63,7 +63,7 @@ public class SahhaPlugin : Plugin() {
         }
 
         // Notification config
-        var sahhaNotificationConfiguration: SahhaNotificationConfiguration? = null
+        var sahhaNotificationConfiguration = SahhaNotificationConfiguration.DEFAULT
         try {
             settings.getJSObject("notificationSettings")?.also { nSettings ->
                 val icon = nSettings.getString("icon")
@@ -71,12 +71,12 @@ public class SahhaPlugin : Plugin() {
                 val shortDescription = nSettings.getString("shortDescription")
 
                 sahhaNotificationConfiguration = SahhaNotificationConfiguration(
-                    SahhaConverterUtility.stringToDrawableResource(
+                    stringToDrawableResource(
                         context,
                         icon
-                    ),
-                    title,
-                    shortDescription,
+                    ) ?: 0,
+                    title ?: "title",
+                    shortDescription ?: "shortDescription",
                 )
             }
         } catch (e: IllegalArgumentException) {
@@ -87,8 +87,8 @@ public class SahhaPlugin : Plugin() {
 
         val sahhaSettings = SahhaSettings(
             sahhaEnvironment,
-            sahhaNotificationConfiguration,
-            SahhaFramework.capacitor
+            SahhaFramework.CAPACITOR,
+            sahhaNotificationConfiguration
         )
 
         val activity = activity as? ComponentActivity
@@ -288,7 +288,7 @@ public class SahhaPlugin : Plugin() {
         try {
             for (i in 0 until sensors.length()) {
                 var sensor: String = sensors.getString(i)
-                var sahhaSensor = SahhaSensor.valueOf(sensor)
+                var sahhaSensor = SahhaSensor.valueOf(sensor.uppercase())
                 sahhaSensors.add(sahhaSensor)
             }
         } catch (e: IllegalArgumentException) {
@@ -297,14 +297,13 @@ public class SahhaPlugin : Plugin() {
         }
 
         Sahha.getSensorStatus(
-            context,
             sahhaSensors,
         ) { error, sensorStatus ->
             if (error != null) {
                 call.reject(error)
             } else {
                 val data = JSObject()
-                data.put("status", sensorStatus.ordinal)
+                data.put("status", sensorStatus)
                 call.resolve(data)
             }
         }
@@ -324,7 +323,7 @@ public class SahhaPlugin : Plugin() {
         try {
             for (i in 0 until sensors.length()) {
                 var sensor: String = sensors.getString(i)
-                var sahhaSensor = SahhaSensor.valueOf(sensor)
+                var sahhaSensor = SahhaSensor.valueOf(sensor.uppercase())
                 sahhaSensors.add(sahhaSensor)
             }
         } catch (e: IllegalArgumentException) {
@@ -332,12 +331,12 @@ public class SahhaPlugin : Plugin() {
             return
         }
 
-        Sahha.enableSensors(context, sahhaSensors) { error, sensorStatus ->
+        Sahha.enableSensors(sahhaSensors) { error, sensorStatus ->
             if (error != null) {
                 call.reject(error)
             } else {
                 val data = JSObject()
-                data.put("status", sensorStatus.ordinal)
+                data.put("status", sensorStatus)
                 call.resolve(data)
             }
         }
@@ -370,7 +369,7 @@ public class SahhaPlugin : Plugin() {
         try {
             for (i in 0 until types.length()) {
                 val type: String = types.getString(i)
-                val scoreType = SahhaScoreType.valueOf(type)
+                val scoreType = SahhaScoreType.valueOf(type.uppercase())
                 sahhaScoreTypes.add(scoreType)
             }
         } catch (e: IllegalArgumentException) {
@@ -461,7 +460,7 @@ public class SahhaPlugin : Plugin() {
         try {
             for (i in 0 until categories.length()) {
                 val category: String = categories.getString(i)
-                val biomarkerCategory = SahhaBiomarkerCategory.valueOf(category)
+                val biomarkerCategory = SahhaBiomarkerCategory.valueOf(category.uppercase())
                 sahhaBiomarkerCategories.add(biomarkerCategory)
             }
         } catch (e: IllegalArgumentException) {
@@ -473,7 +472,7 @@ public class SahhaPlugin : Plugin() {
         try {
             for (i in 0 until types.length()) {
                 val type: String = types.getString(i)
-                val biomarkerType = SahhaBiomarkerType.valueOf(type)
+                val biomarkerType = SahhaBiomarkerType.valueOf(type.uppercase())
                 sahhaBiomarkerTypes.add(biomarkerType)
             }
         } catch (e: IllegalArgumentException) {
@@ -562,7 +561,7 @@ public class SahhaPlugin : Plugin() {
         val endLocalDateTime = LocalDateTime.ofInstant(endInstant, defaultZoneId)
 
         Sahha.getStats(
-            sensor = SahhaSensor.valueOf(sensor),
+            sensor = SahhaSensor.valueOf(sensor.uppercase()),
             Pair(startLocalDateTime, endLocalDateTime)
         ) { error, value ->
             if (error != null) {
@@ -619,7 +618,7 @@ public class SahhaPlugin : Plugin() {
         val endLocalDateTime = LocalDateTime.ofInstant(endInstant, defaultZoneId)
 
         Sahha.getSamples(
-            sensor = SahhaSensor.valueOf(sensor),
+            sensor = SahhaSensor.valueOf(sensor.uppercase()),
             Pair(startLocalDateTime, endLocalDateTime)
         ) { error, value ->
             if (error != null) {
@@ -654,7 +653,15 @@ public class SahhaPlugin : Plugin() {
 
     @PluginMethod
     fun openAppSettings(call: PluginCall) {
-        Sahha.openAppSettings(context)
+        Sahha.openAppSettings()
         call.resolve()
+    }
+
+    fun stringToDrawableResource(context: Context, iconString: String?): Int? {
+        return try {
+            context.resources.getIdentifier(iconString, "drawable", context.packageName)
+        } catch (e: Exception) {
+            null
+        }
     }
 }
