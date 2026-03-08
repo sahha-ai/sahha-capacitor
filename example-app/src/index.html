@@ -163,14 +163,47 @@
 
 <body>
   <main>
-    <h1>Sahha SDK Demo</h1>
-
-    <div class="field-group">
-      <label for="environment">Environment</label>
-      <select id="environment" onchange="configure()">
-        <option value="sandbox">Sandbox</option>
-        <option value="production">Production</option>
-        <option value="development">Development</option>
+    <h1>Sahha Capacitor SDK Demo</h1>
+    <div>
+      Environment:
+      <br />
+      <select name="environment" id="environment">
+        <option value="sandbox">sandbox</option>
+        <option value="production">production</option>
+      </select>
+    </div>
+    <div>
+      App Id:
+      <br />
+      <input type="text" id="appId" name="appId" value="" />
+    </div>
+    <div>
+      App Secret:
+      <br />
+      <input type="text" id="appSecret" name="appSecret" value="" />
+    </div>
+    <div>
+      External Id:
+      <br />
+      <input type="text" id="externalId" name="externalId" value="" />
+    </div>
+    <div>
+      Authenticated:
+      <br />
+      <input type="text" id="isAuthenticated" name="isAuthenticated" value="false" disabled />
+      <br />
+    </div>
+    <div>
+      <button onclick="authenticate()">Authenticate</button>
+    </div>
+    <hr class="solid">
+    <div>
+      Gender:
+      <br />
+      <select name="gender" id="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Gender Diverse">Gender Diverse</option>
       </select>
     </div>
 

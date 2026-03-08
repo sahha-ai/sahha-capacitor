@@ -85,9 +85,9 @@ window.authenticate = () => {
 window.postDemographic = () => {
     const demographic = {};
     demographicFields.forEach(field => {
-        const value = document.getElementById(field).value;
+        const value = document.getElementById(field)?.value;
         localStorage.setItem(field, value);
-        if (value !== "") {
+        if (value && value !== "") {
             demographic[field] = field === "age" ? parseInt(value) : value;
         } else {
             demographic[field] = null;
@@ -120,7 +120,7 @@ window.getDemographic = () => {
                     const value = json[field];
                     if (value !== undefined && value !== null) {
                         const stringValue = value.toString();
-                        document.getElementById(field).value = stringValue;
+                        document.getElementById(field)?.value = stringValue;
                         localStorage.setItem(field, stringValue);
                     }
                 });
@@ -302,4 +302,8 @@ window.openAppSettings = () => {
     )
 }
 
-setup();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+} else {
+    setup();
+}
