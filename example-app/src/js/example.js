@@ -2,7 +2,7 @@ import { Sahha, SahhaEnvironment, SahhaSensor, SahhaSensorStatus } from 'sahha-c
 import { SahhaScoreType } from '../../../dist/esm/definitions';
 import { SahhaBiomarkerCategory, SahhaBiomarkerType } from '../../../dist/esm/definitions';
 
-const demographicFields = ["gender", "age", "birthDate", "country", "birthCountry", "ethnicity", "occupation", "industry", "incomeRange", "education", "relationship", "locale", "livingArrangement"];
+const demographicFields = ["gender", "age", "birthDate"];
 
 window.setup = () => {
 
@@ -136,7 +136,7 @@ window.getDemographic = () => {
     )
 }
 
-let sensors = [SahhaSensor.sleep, SahhaSensor.body_fat, SahhaSensor.steps, SahhaSensor.floors_climbed, SahhaSensor.active_energy_burned, SahhaSensor.heart_rate, SahhaSensor.blood_pressure_diastolic];
+let sensors = [SahhaSensor.steps];
 
 window.getSensorStatus = () => {
     Sahha.getSensorStatus({ sensors: sensors }).then(

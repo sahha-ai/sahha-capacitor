@@ -234,31 +234,11 @@ public class SahhaPlugin : Plugin() {
 
         val age: Int? = demographic.optInt("age")
         val gender: String? = demographic.optString("gender")
-        val country: String? = demographic.optString("country")
-        val birthCountry: String? = demographic.optString("birthCountry")
-        val ethnicity: String? = demographic.optString("ethnicity")
-        val occupation: String? = demographic.optString("occupation")
-        val industry: String? = demographic.optString("industry")
-        val incomeRange: String? = demographic.optString("incomeRange")
-        val education: String? = demographic.optString("education")
-        val relationship: String? = demographic.optString("relationship")
-        val locale: String? = demographic.optString("locale")
-        val livingArrangement: String? = demographic.optString("livingArrangement")
         val birthDate: String? = demographic.optString("birthDate")
 
         var sahhaDemographic = SahhaDemographic(
             age = if (age == 0) null else age,
             gender = gender?.ifEmpty { null },
-            country = country?.ifEmpty { null },
-            birthCountry = birthCountry?.ifEmpty { null },
-            ethnicity = ethnicity?.ifEmpty { null },
-            occupation = occupation?.ifEmpty { null },
-            industry = industry?.ifEmpty { null },
-            incomeRange = incomeRange?.ifEmpty { null },
-            education = education?.ifEmpty { null },
-            relationship = relationship?.ifEmpty { null },
-            locale = locale?.ifEmpty { null },
-            livingArrangement = livingArrangement?.ifEmpty { null },
             birthDate = birthDate?.ifEmpty { null },
         )
         Log.d("Sahha", sahhaDemographic.toString())

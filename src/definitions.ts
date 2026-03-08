@@ -153,16 +153,6 @@ export interface SahhaSettings {
 export interface SahhaDemographic {
   age?: number;
   gender?: string;
-  country?: string;
-  birthCountry?: string;
-  ethnicity?: string;
-  occupation?: string;
-  industry?: string;
-  incomeRange?: string;
-  education?: string;
-  relationship?: string;
-  locale?: string;
-  livingArrangement?: string;
   birthDate?: string;
 }
 
