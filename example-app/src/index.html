@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang="en" dir="ltr" class="hydrated">
-
 <head>
   <meta charset="UTF-8" />
   <title>Sahha SDK Demo</title>
-  <meta name="viewport"
-    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta
+    name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
   <meta name="format-detection" content="telephone=no" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --primary: #6366f1;
@@ -56,7 +59,7 @@
     }
 
     .field-group {
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     label {
@@ -110,6 +113,15 @@
       transform: translateY(0);
     }
 
+    .button-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    .button-secondary:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
     hr {
       border: 0;
       border-top: 1px solid var(--border);
@@ -124,10 +136,10 @@
       font-size: 12px;
       color: #10b981;
       white-space: pre-wrap;
-      word-break: break-all;
+      word-break: break-word;
       margin-top: 24px;
       border: 1px solid var(--border);
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
     }
 
@@ -158,54 +170,37 @@
       box-shadow: none;
       width: auto;
     }
+
+    .section-title {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
   </style>
 </head>
 
 <body>
   <main>
     <h1>Sahha Capacitor SDK Demo</h1>
-    <div>
-      Environment:
-      <br />
-      <select name="environment" id="environment">
+
+    <div class="section-title">Configuration</div>
+
+    <div class="field-group">
+      <label for="environment">Environment</label>
+      <select id="environment" name="environment">
+        <option value="development">development</option>
         <option value="sandbox">sandbox</option>
         <option value="production">production</option>
       </select>
     </div>
-    <div>
-      App Id:
-      <br />
-      <input type="text" id="appId" name="appId" value="" />
-    </div>
-    <div>
-      App Secret:
-      <br />
-      <input type="text" id="appSecret" name="appSecret" value="" />
-    </div>
-    <div>
-      External Id:
-      <br />
-      <input type="text" id="externalId" name="externalId" value="" />
-    </div>
-    <div>
-      Authenticated:
-      <br />
-      <input type="text" id="isAuthenticated" name="isAuthenticated" value="false" disabled />
-      <br />
-    </div>
-    <div>
-      <button onclick="authenticate()">Authenticate</button>
-    </div>
-    <hr class="solid">
-    <div>
-      Gender:
-      <br />
-      <select name="gender" id="gender">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Gender Diverse">Gender Diverse</option>
-      </select>
-    </div>
+
+    <button onclick="configure()">Configure</button>
+
+    <hr>
+
+    <div class="section-title">Authentication</div>
 
     <div class="field-group">
       <label for="appId">App Id</label>
@@ -223,13 +218,15 @@
     </div>
 
     <div class="inline-field">
-      <label>Authenticated:</label>
+      <label for="isAuthenticated">Authenticated:</label>
       <input type="text" id="isAuthenticated" value="false" readonly />
     </div>
 
     <button onclick="authenticate()">Authenticate</button>
 
     <hr>
+
+    <div class="section-title">Demographic</div>
 
     <div class="row">
       <div class="field-group">
@@ -241,20 +238,17 @@
           <option value="Gender Diverse">Gender Diverse</option>
         </select>
       </div>
+
       <div class="field-group">
         <label for="age">Age</label>
         <input type="number" id="age" placeholder="25" />
       </div>
     </div>
 
-    <div class="row">
-      <div class="field-group">
-        <label for="birthDate">Birth Date</label>
-        <input type="date" id="birthDate" />
-      </div>
-
+    <div class="field-group">
+      <label for="birthDate">Birth Date</label>
+      <input type="date" id="birthDate" />
     </div>
-
 
     <div class="row">
       <button onclick="postDemographic()">Post Demographic</button>
@@ -263,14 +257,21 @@
 
     <hr>
 
+    <div class="section-title">Sensors</div>
+
     <div class="inline-field">
-      <label>Sensors Status:</label>
+      <label for="isSensorsEnabled">Sensors Status:</label>
       <input type="text" id="isSensorsEnabled" value="pending" readonly />
     </div>
 
-    <button onclick="enableSensors()">Enable Sensors</button>
-    <button onclick="getSensorStatus()">Get Sensor Status</button>
+    <div class="row">
+      <button onclick="enableSensors()">Enable Sensors</button>
+      <button onclick="getSensorStatus()">Get Sensor Status</button>
+    </div>
+
     <hr>
+
+    <div class="section-title">Utilities</div>
 
     <div class="row">
       <button onclick="openAppSettings()">App Settings</button>
@@ -279,18 +280,21 @@
 
     <hr>
 
+    <div class="section-title">Data Queries</div>
+
     <div class="row">
       <div class="field-group">
         <label for="startDateInput">Start Date</label>
-        <input type="date" id="startDateInput">
+        <input type="date" id="startDateInput" />
       </div>
+
       <div class="field-group">
         <label for="endDateInput">End Date</label>
-        <input type="date" id="endDateInput">
+        <input type="date" id="endDateInput" />
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 8px;">
+    <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; margin-top:8px;">
       <button onclick="getScores()">Scores</button>
       <button onclick="getBiomarkers()">Biomarkers</button>
       <button onclick="getStats()">Stats</button>
@@ -299,7 +303,7 @@
 
     <p id="jsonText">Ready</p>
   </main>
+
   <script src="./js/example.js" type="module"></script>
 </body>
-
 </html>

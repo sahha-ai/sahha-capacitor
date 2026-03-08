@@ -1,5 +1,5 @@
-import Foundation
 import Capacitor
+import Foundation
 import Sahha
 
 /**
@@ -29,42 +29,46 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getSamples", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "postSensorData", returnType: CAPPluginReturnPromise),
     ]
-    
+
     private func encodeJson<T: Encodable>(_ value: T) throws -> String {
         let jsonData = try JSONEncoder().encode(value)
         if let jsonString = String(data: jsonData, encoding: .utf8) {
             return jsonString
         } else {
-            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: [], debugDescription: "Unable to encode value"))
+            throw EncodingError.invalidValue(
+                value,
+                EncodingError.Context(codingPath: [], debugDescription: "Unable to encode value"))
         }
     }
-    
+
     @objc func configure(_ call: CAPPluginCall) {
         guard let settings = call.getObject("settings") else {
             call.reject("Sahha configure settings parameter is missing")
             return
         }
-        
-        guard let environment = settings["environment"] as? String, let sahhaEnvironment = SahhaEnvironment(rawValue: environment) else {
+
+        guard let environment = settings["environment"] as? String,
+            let sahhaEnvironment = SahhaEnvironment(rawValue: environment)
+        else {
             call.reject("Sahha configure settings environment parameter is missing")
             return
         }
         var sahhaSettings = SahhaSettings(environment: sahhaEnvironment)
         sahhaSettings.framework = .capacitor
-        
+
         Sahha.configure(sahhaSettings) {
             call.resolve([
                 "success": true
             ])
         }
     }
-    
+
     @objc func isAuthenticated(_ call: CAPPluginCall) {
         call.resolve([
             "success": Sahha.isAuthenticated
         ])
     }
-    
+
     @objc func authenticate(_ call: CAPPluginCall) {
         guard let appId = call.getString("appId") else {
             call.reject("Sahha authenticate appId parameter is missing")
@@ -78,8 +82,9 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("Sahha authenticate externalId parameter is missing")
             return
         }
-        
-        Sahha.authenticate(appId: appId, appSecret: appSecret, externalId: externalId) { error, success in
+
+        Sahha.authenticate(appId: appId, appSecret: appSecret, externalId: externalId) {
+            error, success in
             if let error = error {
                 call.reject(error)
             } else {
@@ -89,7 +94,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-    
+
     @objc func authenticateToken(_ call: CAPPluginCall) {
         guard let profileToken = call.getString("profileToken") else {
             call.reject("Sahha authenticateToken profileToken parameter is missing")
@@ -99,8 +104,9 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("Sahha authenticateToken refreshToken parameter is missing")
             return
         }
-        
-        Sahha.authenticate(profileToken: profileToken, refreshToken: refreshToken) { error, success in
+
+        Sahha.authenticate(profileToken: profileToken, refreshToken: refreshToken) {
+            error, success in
             if let error = error {
                 call.reject(error)
             } else {
@@ -110,7 +116,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-    
+
     @objc func deauthenticate(_ call: CAPPluginCall) {
         Sahha.deauthenticate { error, success in
             if let error = error {
@@ -122,7 +128,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-    
+
     @objc func getProfileToken(_ call: CAPPluginCall) {
         if let token = Sahha.profileToken {
             call.resolve(["profileToken": token])
@@ -130,7 +136,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("No profile token found")
         }
     }
-    
+
     @objc func getDemographic(_ call: CAPPluginCall) {
         Sahha.getDemographic { error, value in
             if let error = error {
@@ -148,92 +154,98 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-    
+
     @objc func postDemographic(_ call: CAPPluginCall) {
         guard let demographic = call.getObject("demographic") else {
             call.reject("Sahha postDemographic demographic parameter is missing")
             return
         }
-        
+
         var sahhaDemographic = SahhaDemographic()
-        
+
         if let gender = demographic["gender"] as? String {
             sahhaDemographic.gender = gender
         }
-        
+
         if let birthDate = demographic["birthDate"] as? String {
             sahhaDemographic.birthDate = birthDate
         }
-        
+
         Sahha.postDemographic(sahhaDemographic) { error, success in
             if let error = error {
                 call.reject(error)
             } else {
-                call.resolve(["success" : success])
+                call.resolve(["success": success])
             }
         }
     }
-    
+
+    private func parseSensors(from call: CAPPluginCall, methodName: String) -> Set<SahhaSensor>? {
+        guard let sensors = call.getArray("sensors") as? [String] else {
+            call.reject("Sahha \(methodName) sensors parameter is missing")
+            return nil
+        }
+
+        var configSensors = Set<SahhaSensor>()
+        for sensor in sensors {
+            guard let configSensor = SahhaSensor(rawValue: sensor) else {
+                call.reject("Sahha sensor parameter is not valid")
+                return nil
+            }
+            configSensors.insert(configSensor)
+        }
+
+        return configSensors
+    }
+
+    private func resolveSensorStatus(_ call: CAPPluginCall, sensors: Set<SahhaSensor>) {
+        Sahha.getSensorStatus(sensors) { error, sensorStatus in
+            if let error = error {
+                call.reject(error)
+            } else {
+                call.resolve(["status": sensorStatus.rawValue])
+            }
+        }
+    }
+
     @objc func getSensorStatus(_ call: CAPPluginCall) {
-        guard let sensors = call.getArray("sensors") as? [String] else {
-            call.reject("Sahha getSensorStatus sensors parameter is missing")
+        guard let configSensors = parseSensors(from: call, methodName: "getSensorStatus") else {
             return
         }
-        
-        var configSensors: Set<SahhaSensor> = []
-        for sensor in sensors {
-            if let configSensor = SahhaSensor(rawValue: sensor) {
-                configSensors.insert(configSensor)
-            }
-        }
-        
-        Sahha.getSensorStatus(configSensors) { error, sensorStatus in
-            if let error = error {
-                call.reject(error)
-            } else {
-                call.resolve(["status" : sensorStatus.rawValue])
-            }
-        }
+
+        resolveSensorStatus(call, sensors: configSensors)
     }
-    
+
     @objc func enableSensors(_ call: CAPPluginCall) {
-        guard let sensors = call.getArray("sensors") as? [String] else {
-            call.reject("Sahha enableSensors sensors parameter is missing")
+        guard let configSensors = parseSensors(from: call, methodName: "enableSensors") else {
             return
         }
-        
-        var configSensors: Set<SahhaSensor> = []
-        for sensor in sensors {
-            if let configSensor = SahhaSensor(rawValue: sensor) {
-                configSensors.insert(configSensor)
-            }
-        }
-        
-        Sahha.enableSensors(configSensors) { error, sensorStatus in
+
+        Sahha.enableSensors(configSensors) { error, _ in
             if let error = error {
                 call.reject(error)
             } else {
-                call.resolve(["status" : sensorStatus.rawValue])
+                self.resolveSensorStatus(call, sensors: configSensors)
             }
         }
     }
-    
+
     @objc func getScores(_ call: CAPPluginCall) {
         guard let types = call.getArray("types", String.self) else {
             call.reject("Sahha getScores types parameter is missing")
             return
         }
-        
+
         guard let startDateEpochMilli = call.getDouble("startDateTime") else {
             call.reject("Sahha getScores startDateTime parameter is missing")
             return
         }
-        
+
         guard let endDateEpochMilli = call.getDouble("endDateTime") else {
             call.reject("Sahha getScores endDateTime parameter is missing")
             return
         }
-        
+
         var sahhaScoreTypes = Set<SahhaScoreType>()
         for type in types {
             if let scoreType = SahhaScoreType(rawValue: type) {
@@ -243,11 +255,12 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 return
             }
         }
-        
+
         let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
         let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-        
-        Sahha.getScores(types: sahhaScoreTypes, startDateTime: startDate, endDateTime: endDate) { error, scores in
+
+        Sahha.getScores(types: sahhaScoreTypes, startDateTime: startDate, endDateTime: endDate) {
+            error, scores in
             if let error = error {
                 call.reject(error)
             } else if let scores = scores {
@@ -257,10 +270,10 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 } catch let encodingError {
                     print(encodingError)
                     Sahha.postError(
-                            framework: .capacitor,
-                            message: encodingError.localizedDescription,
-                            path: "SahhaCapacitor", method: "getScores",
-                            body: "jsonEncoder")
+                        framework: .capacitor,
+                        message: encodingError.localizedDescription,
+                        path: "SahhaCapacitor", method: "getScores",
+                        body: "jsonEncoder")
                     call.reject(encodingError.localizedDescription)
                 }
             } else {
@@ -268,28 +281,28 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-    
+
     @objc func getBiomarkers(_ call: CAPPluginCall) {
         guard let categories = call.getArray("categories", String.self) else {
             call.reject("Sahha getBiomarkers categories parameter is missing")
             return
         }
-        
+
         guard let types = call.getArray("types", String.self) else {
             call.reject("Sahha getBiomarkers types parameter is missing")
             return
         }
-        
+
         guard let startDateEpochMilli = call.getDouble("startDateTime") else {
             call.reject("Sahha getBiomarkers startDateTime parameter is missing")
             return
         }
-        
+
         guard let endDateEpochMilli = call.getDouble("endDateTime") else {
             call.reject("Sahha getBiomarkers endDateTime parameter is missing")
             return
         }
-        
+
         var sahhaBiomarkerCategories = Set<SahhaBiomarkerCategory>()
         for category in categories {
             if let biomarkerCategory = SahhaBiomarkerCategory(rawValue: category) {
@@ -299,7 +312,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 return
             }
         }
-        
+
         var sahhaBiomarkerTypes = Set<SahhaBiomarkerType>()
         for type in types {
             if let biomarkerType = SahhaBiomarkerType(rawValue: type) {
@@ -309,11 +322,14 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 return
             }
         }
-        
+
         let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
         let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-        
-        Sahha.getBiomarkers(categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes, startDateTime: startDate, endDateTime: endDate) { error, biomarkers in
+
+        Sahha.getBiomarkers(
+            categories: sahhaBiomarkerCategories, types: sahhaBiomarkerTypes,
+            startDateTime: startDate, endDateTime: endDate
+        ) { error, biomarkers in
             if let error = error {
                 call.reject(error)
             } else if let biomarkers = biomarkers {
@@ -323,10 +339,10 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
                 } catch let encodingError {
                     print(encodingError)
                     Sahha.postError(
-                            framework: .capacitor,
-                            message: encodingError.localizedDescription,
-                            path: "SahhaCapacitor", method: "getBiomarkers",
-                            body: "jsonEncoder")
+                        framework: .capacitor,
+                        message: encodingError.localizedDescription,
+                        path: "SahhaCapacitor", method: "getBiomarkers",
+                        body: "jsonEncoder")
                     call.reject(encodingError.localizedDescription)
                 }
             } else {
@@ -334,28 +350,29 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
     }
-    
+
     @objc func getStats(_ call: CAPPluginCall) {
         guard let sensor = call.getString("sensor") else {
             call.reject("Sahha getStats sensor parameter is missing")
             return
         }
-        
+
         guard let startDateEpochMilli = call.getDouble("startDateTime") else {
             call.reject("Sahha getStats startDateTime parameter is missing")
             return
         }
-        
+
         guard let endDateEpochMilli = call.getDouble("endDateTime") else {
             call.reject("Sahha getStats endDateTime parameter is missing")
             return
         }
-        
+
         let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
         let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-        
+
         if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-            Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, stats in
+            Sahha.getStats(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) {
+                error, stats in
                 if let error = error {
                     if error.lowercased().contains("found") {
                         call.resolve(["value": "[]"])
@@ -388,28 +405,29 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("Invalid sensor: \(sensor)")
         }
     }
-    
+
     @objc func getSamples(_ call: CAPPluginCall) {
         guard let sensor = call.getString("sensor") else {
             call.reject("Sahha getSamples sensor parameter is missing")
             return
         }
-        
+
         guard let startDateEpochMilli = call.getDouble("startDateTime") else {
             call.reject("Sahha getSamples startDate parameter is missing")
             return
         }
-        
+
         guard let endDateEpochMilli = call.getDouble("endDateTime") else {
             call.reject("Sahha getSamples endDate parameter is missing")
             return
         }
-        
+
         let startDate = Date(timeIntervalSince1970: startDateEpochMilli / 1000)
         let endDate = Date(timeIntervalSince1970: endDateEpochMilli / 1000)
-        
+
         if let sahhaSensor = SahhaSensor(rawValue: sensor) {
-            Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) { error, stats in
+            Sahha.getSamples(sensor: sahhaSensor, startDateTime: startDate, endDateTime: endDate) {
+                error, stats in
                 if let error = error {
                     if error.lowercased().contains("found") {
                         call.resolve(["value": "[]"])
@@ -442,13 +460,13 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             call.reject("Invalid sensor: \(sensor)")
         }
     }
-    
+
     @objc func postSensorData(_ call: CAPPluginCall) {
         Sahha.postSensorData { _ in
             call.resolve()
         }
     }
-    
+
     @objc func openAppSettings(_ call: CAPPluginCall) {
         Sahha.openAppSettings()
         call.resolve()

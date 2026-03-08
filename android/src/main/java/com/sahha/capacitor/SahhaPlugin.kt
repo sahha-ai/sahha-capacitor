@@ -254,73 +254,61 @@ public class SahhaPlugin : Plugin() {
         }
     }
 
-    @PluginMethod
-    fun getSensorStatus(call: PluginCall) {
 
-        var sensors: JSArray? = call.getArray("sensors")
+private fun parseSensors(call: PluginCall, methodName: String): MutableSet<SahhaSensor>? {
+    val sensors: JSArray? = call.getArray("sensors")
 
-        if (sensors == null) {
-            call.reject("Sahha getSensorStatus sensors parameter is missing")
-            return
-        }
-
-        var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf<SahhaSensor>()
-        try {
-            for (i in 0 until sensors.length()) {
-                var sensor: String = sensors.getString(i)
-                var sahhaSensor = SahhaSensor.valueOf(sensor.uppercase())
-                sahhaSensors.add(sahhaSensor)
-            }
-        } catch (e: IllegalArgumentException) {
-            call.reject("Sahha sensor parameter is not valid")
-            return
-        }
-
-        Sahha.getSensorStatus(
-            sahhaSensors,
-        ) { error, sensorStatus ->
-            if (error != null) {
-                call.reject(error)
-            } else {
-                val data = JSObject()
-                data.put("status", sensorStatus)
-                call.resolve(data)
-            }
-        }
+    if (sensors == null) {
+        call.reject("Sahha $methodName sensors parameter is missing")
+        return null
     }
 
-    @PluginMethod
-    fun enableSensors(call: PluginCall) {
-
-        var sensors: JSArray? = call.getArray("sensors")
-
-        if (sensors == null) {
-            call.reject("Sahha enableSensors sensors parameter is missing")
-            return
+    val sahhaSensors = mutableSetOf<SahhaSensor>()
+    try {
+        for (i in 0 until sensors.length()) {
+            val sensor = sensors.getString(i)
+            val sahhaSensor = SahhaSensor.valueOf(sensor.uppercase())
+            sahhaSensors.add(sahhaSensor)
         }
+    } catch (e: IllegalArgumentException) {
+        call.reject("Sahha sensor parameter is not valid")
+        return null
+    }
 
-        var sahhaSensors: MutableSet<SahhaSensor> = mutableSetOf<SahhaSensor>()
-        try {
-            for (i in 0 until sensors.length()) {
-                var sensor: String = sensors.getString(i)
-                var sahhaSensor = SahhaSensor.valueOf(sensor.uppercase())
-                sahhaSensors.add(sahhaSensor)
-            }
-        } catch (e: IllegalArgumentException) {
-            call.reject("Sahha sensor parameter is not valid")
-            return
-        }
+    return sahhaSensors
+}
 
-        Sahha.enableSensors(sahhaSensors) { error, sensorStatus ->
-            if (error != null) {
-                call.reject(error)
-            } else {
-                val data = JSObject()
-                data.put("status", sensorStatus)
-                call.resolve(data)
-            }
+private fun resolveSensorStatus(call: PluginCall, sahhaSensors: Set<SahhaSensor>) {
+    Sahha.getSensorStatus(sahhaSensors) { error, sensorStatus ->
+        if (error != null) {
+            call.reject(error)
+        } else {
+            val data = JSObject()
+            data.put("status", sensorStatus)
+            call.resolve(data)
         }
     }
+}
+
+
+  @PluginMethod
+fun getSensorStatus(call: PluginCall) {
+    val sahhaSensors = parseSensors(call, "getSensorStatus") ?: return
+    resolveSensorStatus(call, sahhaSensors)
+}
+
+@PluginMethod
+fun enableSensors(call: PluginCall) {
+    val sahhaSensors = parseSensors(call, "enableSensors") ?: return
+
+    Sahha.enableSensors(sahhaSensors) { error, _ ->
+        if (error != null) {
+            call.reject(error)
+        } else {
+            resolveSensorStatus(call, sahhaSensors)
+        }
+    }
+}
 
     @PluginMethod
     fun getScores(call: PluginCall) {

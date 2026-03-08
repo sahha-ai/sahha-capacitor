@@ -15,9 +15,11 @@
 
     <!-- Sleep -->
     <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    <uses-permission android:name="android.permission.health.WRITE_SLEEP" />
 
     <!-- Activity -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.WRITE_STEPS" />
     <uses-permission android:name="android.permission.health.READ_FLOORS_CLIMBED" />
 
     <!-- Oxygen -->
