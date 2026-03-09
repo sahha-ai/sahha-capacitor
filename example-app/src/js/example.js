@@ -1,269 +1,320 @@
-import { Sahha, SahhaEnvironment, SahhaSensor, SahhaSensorStatus } from 'sahha-capacitor';
-import { SahhaScoreType } from '../../../dist/esm/definitions';
-import { SahhaBiomarkerCategory, SahhaBiomarkerType } from '../../../dist/esm/definitions';
+import { Sahha, SahhaSensor, SahhaSensorStatus } from 'sahha-capacitor';
+import { SahhaScoreType, SahhaBiomarkerCategory, SahhaBiomarkerType } from '../../../dist/esm/definitions';
+
+const demographicFields = ["gender", "age", "birthDate"];
+const sensors = [SahhaSensor.steps, SahhaSensor.sleep ];
+
+const $ = (id) => document.getElementById(id);
+
+function setStatus(message) {
+    $("jsonText").innerText = message;
+}
+
+function formatError(prefix, error) {
+    return `${prefix}: ${error?.message || error?.errorMessage || JSON.stringify(error)}`;
+}
+
+function getDateRange() {
+    const startDate = $("startDateInput").value;
+    const endDate = $("endDateInput").value;
+
+    return {
+        startDateTime: startDate ? parseLocalDate(startDate).getTime() : null,
+        endDateTime: endDate ? parseLocalDate(endDate).getTime() : null
+    };
+}
 
 window.setup = () => {
+    $("environment").value = localStorage.getItem("environment") ?? "sandbox";
+    $("appId").value = localStorage.getItem("appId") ?? "";
+    $("appSecret").value = localStorage.getItem("appSecret") ?? "";
+    $("externalId").value = localStorage.getItem("externalId") ?? "";
 
-    document.getElementById("appId").value = localStorage.appId ?? "";
-    document.getElementById("appSecret").value = localStorage.appSecret ?? "";
-    document.getElementById("externalId").value = localStorage.externalId ?? "";
-    document.getElementById("gender").value = localStorage.gender ?? "";
-    document.getElementById("age").value = localStorage.age ?? "";
+    demographicFields.forEach((field) => {
+        const element = $(field);
+        if (element) {
+            element.value = localStorage.getItem(field) ?? "";
+        }
+    });
 
-    configure();
-}
+    window.isAuthenticated();
+    window.getSensorStatus();
+};
 
 window.configure = () => {
-    Sahha.configure({
-        settings: {
-            environment: SahhaEnvironment.sandbox
-        }
-    }).then(
-        function (response) {
-            console.log(response);
-            isAuthenticated();
-            getSensorStatus();
+    const environment = $("environment").value;
+    localStorage.setItem("environment", environment);
+
+    const settings = { environment };
+
+    console.log("Sahha.configure settings:", settings);
+    setStatus("Configuring...");
+
+    Sahha.configure({ settings }).then(
+        (response) => {
+            console.log("Sahha.configure success:", response);
+            setStatus("Configuration Success: " + JSON.stringify(response, null, 2));
+            window.isAuthenticated();
+            window.getSensorStatus();
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.configure error:", error);
+            setStatus(formatError("Configuration Error", error));
         }
-    )
-}
+    );
+};
 
 window.isAuthenticated = () => {
     Sahha.isAuthenticated().then(
-        function (response) {
-            console.log(response);
-            document.getElementById("isAuthenticated").value = response.success;
+        (response) => {
+            console.log("Sahha.isAuthenticated success:", response);
+            $("isAuthenticated").value = String(response.success);
+            setStatus("Is Authenticated: " + response.success);
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.isAuthenticated error:", error);
+            setStatus(formatError("Is Authenticated Error", error));
         }
-    )
-}
+    );
+};
 
 window.authenticate = () => {
-    const appId = document.getElementById("appId").value;
-    const appSecret = document.getElementById("appSecret").value;
-    const externalId = document.getElementById("externalId").value;
+    const appId = $("appId").value.trim();
+    const appSecret = $("appSecret").value.trim();
+    const externalId = $("externalId").value.trim();
+
     localStorage.setItem("appId", appId);
     localStorage.setItem("appSecret", appSecret);
     localStorage.setItem("externalId", externalId);
+
+    setStatus("Authenticating...");
+
     Sahha.authenticate({ appId, appSecret, externalId }).then(
-        function (response) {
-            console.log(response);
-            document.getElementById("isAuthenticated").value = response.success;
+        (response) => {
+            console.log("Sahha.authenticate success:", response);
+            $("isAuthenticated").value = String(response.success);
+            setStatus("Authentication Success: " + JSON.stringify(response, null, 2));
+            alert("Authenticated successfully");
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.authenticate error:", error);
+            setStatus(formatError("Authentication Error", error));
         }
-    )
-}
+    );
+};
 
 window.postDemographic = () => {
-    const gender = document.getElementById("gender").value;
-    const age = document.getElementById("age").value;
-    localStorage.setItem("gender", gender);
-    localStorage.setItem("age", age);
-    Sahha.postDemographic({
-        demographic: {
-            gender: gender !== "" ? gender : null,
-            age: age !== "" ? parseInt(age) : null
+    const demographic = {};
+
+    demographicFields.forEach((field) => {
+        const value = $(field)?.value ?? "";
+        localStorage.setItem(field, value);
+
+        if (value !== "") {
+            demographic[field] = field === "age" ? parseInt(value, 10) : value;
+        } else {
+            demographic[field] = null;
         }
-    }).then(
-        function (response) {
-            console.log(response);
+    });
+
+    console.log("Sahha.postDemographic:", demographic);
+
+    Sahha.postDemographic({ demographic }).then(
+        (response) => {
+            console.log("Sahha.postDemographic success:", response);
+            setStatus("Post Demographic Success: " + JSON.stringify(response, null, 2));
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.postDemographic error:", error);
+            setStatus(formatError("Post Demographic Error", error));
         }
-    )
-}
+    );
+};
 
 window.getDemographic = () => {
     Sahha.getDemographic().then(
-        function (response) {
-            console.log(response);
-            const json = JSON.parse(response.demographic);
-            if (json.gender) {
-                document.getElementById("gender").value = json.gender;
-                localStorage.setItem("gender", json.gender);
-            }
-            if (json.age) {
-                document.getElementById("age").value = json.age.toString();
-                localStorage.setItem("age", json.age.toString());
-            }
-        },
-        function (error) {
-            console.log(error);
-        }
-    )
-}
+        (response) => {
+            console.log("Sahha.getDemographic success:", response);
 
-let sensors = [SahhaSensor.sleep, SahhaSensor.body_fat, SahhaSensor.steps, SahhaSensor.floors_climbed, SahhaSensor.active_energy_burned, SahhaSensor.heart_rate, SahhaSensor.blood_pressure_diastolic];
+            if (!response.demographic) {
+                setStatus("Get Demographic: No data found");
+                return;
+            }
+
+            const json = JSON.parse(response.demographic);
+
+            demographicFields.forEach((field) => {
+                const value = json[field];
+                if (value !== undefined && value !== null) {
+                    const stringValue = value.toString();
+                    $(field).value = stringValue;
+                    localStorage.setItem(field, stringValue);
+                }
+            });
+
+            setStatus("Get Demographic Success:\n" + JSON.stringify(json, null, 2));
+        },
+        (error) => {
+            console.log("Sahha.getDemographic error:", error);
+            setStatus(formatError("Get Demographic Error", error));
+        }
+    );
+};
 
 window.getSensorStatus = () => {
-    Sahha.getSensorStatus({ sensors: sensors }).then(
-        function (response) {
-            console.log(response);
-            document.getElementById("isSensorsEnabled").value = SahhaSensorStatus[response.status];
+    Sahha.getSensorStatus({ sensors }).then(
+        (response) => {
+            console.log("Sahha.getSensorStatus success:", response);
+
+            let statusText = "Unknown";
+            if (typeof response.status === "number") {
+                statusText = SahhaSensorStatus[response.status] || "Unknown";
+            } else if (typeof response.status === "string") {
+                statusText = response.status;
+            }
+
+            $("isSensorsEnabled").value =
+                statusText.charAt(0).toUpperCase() + statusText.slice(1);
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.getSensorStatus error:", error);
+            setStatus(formatError("Sensor Status Error", error));
         }
-    )
-}
+    );
+};
 
 window.enableSensors = () => {
-    Sahha.enableSensors({ sensors: sensors }).then(
-        function (response) {
-            console.log(response);
-            document.getElementById("isSensorsEnabled").value = SahhaSensorStatus[response.status];
+    Sahha.enableSensors({ sensors }).then(
+        (response) => {
+            console.log("Sahha.enableSensors success:", response);
+
+            let statusText = "Unknown";
+            if (typeof response.status === "number") {
+                statusText = SahhaSensorStatus[response.status] || "Unknown";
+            } else if (typeof response.status === "string") {
+                statusText = response.status;
+            }
+
+            $("isSensorsEnabled").value =
+                statusText.charAt(0).toUpperCase() + statusText.slice(1);
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.enableSensors error:", error);
+            setStatus(formatError("Enable Sensors Error", error));
         }
-    )
-}
+    );
+};
 
 window.getScores = () => {
-    const scoreTypes = [SahhaScoreType.activity];
-    const startDate = document.getElementById("startDateInput").value;
-    const endDate = document.getElementById("endDateInput").value;
-    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
-    console.log('startDateJS ' + startDateEpochMilli);
-    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
-    console.log('endDateJS ' + endDateEpochMilli);
+    const types = [SahhaScoreType.activity];
+    const { startDateTime, endDateTime } = getDateRange();
 
-    document.getElementById("jsonText").innerText = "Loading..."
+    setStatus("Loading Scores...");
 
-    Sahha.getScores({ types: scoreTypes, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
-        function (response) {
+    Sahha.getScores({ types, startDateTime, endDateTime }).then(
+        (response) => {
+            console.log("Sahha.getScores success:", response);
             const array = JSON.parse(response.value);
-            const element = array[0];
-            if (element) {
-                const jsonString = JSON.stringify(element);
-                console.log(jsonString);
-            } else {
-                const error = "Failed to retrieve first index of json array"
-                console.log(error);
-            }
-            document.getElementById("jsonText").innerText = response.value;
+            setStatus("Get Scores Success:\n" + JSON.stringify(array, null, 2));
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.getScores error:", error);
+            setStatus(formatError("Get Scores Error", error));
         }
-    )
-}
+    );
+};
 
 window.getBiomarkers = () => {
-    const biomarkerCategories = [SahhaBiomarkerCategory.activity];
-    const biomarkerTypes = [SahhaBiomarkerType.steps];
-    const startDate = document.getElementById("startDateInput").value;
-    const endDate = document.getElementById("endDateInput").value;
-    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
-    console.log('startDateJS ' + startDateEpochMilli);
-    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
-    console.log('endDateJS ' + endDateEpochMilli);
+    const categories = [SahhaBiomarkerCategory.activity];
+    const types = [SahhaBiomarkerType.steps];
+    const { startDateTime, endDateTime } = getDateRange();
 
-    document.getElementById("jsonText").innerText = "Loading..."
+    setStatus("Loading Biomarkers...");
 
-    Sahha.getBiomarkers({ categories: biomarkerCategories, types: biomarkerTypes, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
-        function (response) {
+    Sahha.getBiomarkers({ categories, types, startDateTime, endDateTime }).then(
+        (response) => {
+            console.log("Sahha.getBiomarkers success:", response);
             const array = JSON.parse(response.value);
-            const element = array[0];
-            if (element) {
-                const jsonString = JSON.stringify(element);
-                console.log(jsonString);
-            } else {
-                const error = "Failed to retrieve first index of json array"
-                console.log(error);
-            }
-            document.getElementById("jsonText").innerText = response.value;
+            setStatus("Get Biomarkers Success:\n" + JSON.stringify(array, null, 2));
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.getBiomarkers error:", error);
+            setStatus(formatError("Get Biomarkers Error", error));
         }
-    )
-}
+    );
+};
 
 window.getStats = () => {
-    const sensor = SahhaSensor.blood_pressure_systolic
-    const startDate = document.getElementById("startDateInput").value;
-    const endDate = document.getElementById("endDateInput").value;
-    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
-    console.log('startDateJS ' + startDateEpochMilli);
-    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
-    console.log('endDateJS ' + endDateEpochMilli);
+    const sensor = SahhaSensor.steps;
+    const { startDateTime, endDateTime } = getDateRange();
 
-    document.getElementById("jsonText").innerText = "Loading..."
+    setStatus("Loading Stats...");
 
-    Sahha.getStats({ sensor: sensor, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
-        function (response) {
+    Sahha.getStats({ sensor, startDateTime, endDateTime }).then(
+        (response) => {
+            console.log("Sahha.getStats success:", response);
             const array = JSON.parse(response.value);
-            const element = array[0];
-            if (element) {
-                const jsonString = JSON.stringify(array, null, 6);
-                console.log(jsonString);
-                document.getElementById("jsonText").innerText = jsonString;
-            } else {
-                const error = "Failed to retrieve first index of json array"
-                document.getElementById("jsonText").innerText = error
-                console.log(error);
-            }
+            setStatus("Get Stats Success:\n" + JSON.stringify(array, null, 2));
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.getStats error:", error);
+            setStatus(formatError("Get Stats Error", error));
         }
-    )
-}
+    );
+};
 
 window.getSamples = () => {
-    const sensor = SahhaSensor.steps
-    const startDate = document.getElementById("startDateInput").value;
-    const endDate = document.getElementById("endDateInput").value;
-    const startDateEpochMilli = startDate ? parseLocalDate(startDate).getTime() : null;
-    console.log('startDateJS ' + startDateEpochMilli);
-    const endDateEpochMilli = endDate ? parseLocalDate(endDate).getTime() : null;
-    console.log('endDateJS ' + endDateEpochMilli);
+    const sensor = SahhaSensor.steps;
+    const { startDateTime, endDateTime } = getDateRange();
 
-    document.getElementById("jsonText").innerText = "Loading..."
+    setStatus("Loading Samples...");
 
-    Sahha.getSamples({ sensor: sensor, startDateTime: startDateEpochMilli, endDateTime: endDateEpochMilli }).then(
-        function (response) {
+    Sahha.getSamples({ sensor, startDateTime, endDateTime }).then(
+        (response) => {
+            console.log("Sahha.getSamples success:", response);
             const array = JSON.parse(response.value);
-            const element = array[0];
-            if (element) {
-                const jsonString = JSON.stringify(array, null, 6);
-                console.log(element);
-                document.getElementById("jsonText").innerText = jsonString;
-            } else {
-                const error = "Failed to retrieve first index of json array"
-                document.getElementById("jsonText").innerText = error
-                console.log(error);
-            }
+            setStatus("Get Samples Success:\n" + JSON.stringify(array, null, 2));
         },
-        function (error) {
-            console.log(error);
+        (error) => {
+            console.log("Sahha.getSamples error:", error);
+            setStatus(formatError("Get Samples Error", error));
         }
-    )
-}
+    );
+};
 
-function parseLocalDate(inputValue) {  
-    const [year, month, day] = inputValue.split('-').map(Number);
-
-    // Set to midnight of local date (otherwise ends up being UTC midnight)
-    const date = new Date(year, month - 1, day, 0, 0, 0, 0);
-  
-    return date;
+function parseLocalDate(inputValue) {
+    const [year, month, day] = inputValue.split("-").map(Number);
+    return new Date(year, month - 1, day, 0, 0, 0, 0);
 }
 
 window.postSensorData = () => {
-    Sahha.postSensorData()
-}
+    Sahha.postSensorData().then(
+        () => {
+            console.log("Sahha.postSensorData success");
+            setStatus("Post Sensor Data: Triggered (iOS Only)");
+        },
+        (error) => {
+            console.log("Sahha.postSensorData error:", error);
+            setStatus(formatError("Post Sensor Data Error", error));
+        }
+    );
+};
 
 window.openAppSettings = () => {
-    Sahha.openAppSettings()
-}
+    Sahha.openAppSettings().then(
+        () => {
+            console.log("Sahha.openAppSettings success");
+            setStatus("Open App Settings: Triggered");
+        },
+        (error) => {
+            console.log("Sahha.openAppSettings error:", error);
+            setStatus(formatError("Open App Settings Error", error));
+        }
+    );
+};
 
-setup();
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", window.setup);
+} else {
+    window.setup();
+}

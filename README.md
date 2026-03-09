@@ -50,6 +50,10 @@ page for more information.
 
 ## Install
 
+> **Note**: Sahha Capacitor SDK v1.3.8+ requires **Capacitor 8**. 
+> - **Android**: Requires Java 21, Kotlin 1.9.25+, and Android Gradle Plugin 8.7.2+.
+> - **iOS**: Requires iOS Deployment Target 15.0+ and Xcode 15+.
+
 ```bash
 npm install sahha-capacitor
 npx cap sync
