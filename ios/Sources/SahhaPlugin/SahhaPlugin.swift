@@ -162,6 +162,7 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         }
 
         var sahhaDemographic = SahhaDemographic()
+        
 
         if let gender = demographic["gender"] as? String {
             sahhaDemographic.gender = gender
