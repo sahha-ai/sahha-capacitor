@@ -371,21 +371,11 @@ postSensorData() => Promise<void>
 
 #### SahhaDemographic
 
-| Prop                    | Type                |
-| ----------------------- | ------------------- |
-| **`age`**               | <code>number</code> |
-| **`gender`**            | <code>string</code> |
-| **`country`**           | <code>string</code> |
-| **`birthCountry`**      | <code>string</code> |
-| **`ethnicity`**         | <code>string</code> |
-| **`occupation`**        | <code>string</code> |
-| **`industry`**          | <code>string</code> |
-| **`incomeRange`**       | <code>string</code> |
-| **`education`**         | <code>string</code> |
-| **`relationship`**      | <code>string</code> |
-| **`locale`**            | <code>string</code> |
-| **`livingArrangement`** | <code>string</code> |
-| **`birthDate`**         | <code>string</code> |
+| Prop            | Type                |
+| --------------- | ------------------- |
+| **`age`**       | <code>number</code> |
+| **`gender`**    | <code>string</code> |
+| **`birthDate`** | <code>string</code> |
 
 
 ### Enums
@@ -393,10 +383,11 @@ postSensorData() => Promise<void>
 
 #### SahhaEnvironment
 
-| Members          | Value                     |
-| ---------------- | ------------------------- |
-| **`sandbox`**    | <code>'sandbox'</code>    |
-| **`production`** | <code>'production'</code> |
+| Members           | Value                      |
+| ----------------- | -------------------------- |
+| **`development`** | <code>'development'</code> |
+| **`sandbox`**     | <code>'sandbox'</code>     |
+| **`production`**  | <code>'production'</code>  |
 
 
 #### SahhaSensor
