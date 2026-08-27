@@ -11,7 +11,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", branch: "main"),
-        .package(url: "https://github.com/sahha-ai/sahha-swift.git", branch: "main")
+        .package(url: "https://github.com/sahha-ai/sahha-ios.git", exact: "1.4.0")
     ],
     targets: [
         .target(
@@ -19,7 +19,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "Sahha", package: "sahha-swift")
+                .product(name: "Sahha", package: "sahha-ios")
             ],
             path: "ios/Sources/SahhaPlugin"),
         .testTarget(
