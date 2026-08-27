@@ -199,13 +199,17 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
         return configSensors
     }
 
-    private func resolveSensorStatus(_ call: CAPPluginCall, sensors: Set<SahhaSensor>) {
-        Sahha.getSensorStatus(sensors) { error, sensorStatus in
-            if let error = error {
-                call.reject(error)
-            } else {
-                call.resolve(["status": sensorStatus.rawValue])
-            }
+    /// Maps a sensor status to the TS SahhaSensorStatus enum ordinal: 0..3
+    private static func statusOrdinal(_ sensorStatus: SahhaSensorStatus) -> Int {
+        switch sensorStatus {
+        case .pending: return 0
+        case .unavailable: return 1
+        case .disabled: return 2
+        case .enabled: return 3
+        // The SDK reports .indeterminate externally as enabled (see
+        // HealthKitManager.getSensorStatus); mirror that if it ever surfaces here.
+        case .indeterminate: return 3
+        @unknown default: return 0
         }
     }
 
@@ -214,7 +218,13 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
-        resolveSensorStatus(call, sensors: configSensors)
+        Sahha.getSensorStatus(configSensors) { error, sensorStatus in
+            if let error = error {
+                call.reject(error)
+            } else {
+                call.resolve(["status": Self.statusOrdinal(sensorStatus)])
+            }
+        }
     }
 
     @objc func enableSensors(_ call: CAPPluginCall) {
@@ -222,11 +232,13 @@ public class SahhaPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
-        Sahha.enableSensors(configSensors) { error, _ in
+        // The native SDK resolves the resulting sensor status in the callback,
+        // so no second getSensorStatus round trip is needed.
+        Sahha.enableSensors(configSensors) { error, sensorStatus in
             if let error = error {
                 call.reject(error)
             } else {
-                self.resolveSensorStatus(call, sensors: configSensors)
+                call.resolve(["status": Self.statusOrdinal(sensorStatus)])
             }
         }
     }

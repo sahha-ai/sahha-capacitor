@@ -278,34 +278,34 @@ private fun parseSensors(call: PluginCall, methodName: String): MutableSet<Sahha
     return sahhaSensors
 }
 
-private fun resolveSensorStatus(call: PluginCall, sahhaSensors: Set<SahhaSensor>) {
+@PluginMethod
+fun getSensorStatus(call: PluginCall) {
+    val sahhaSensors = parseSensors(call, "getSensorStatus") ?: return
+
     Sahha.getSensorStatus(sahhaSensors) { error, sensorStatus ->
         if (error != null) {
             call.reject(error)
         } else {
             val data = JSObject()
-            data.put("status", sensorStatus)
+            data.put("status", sensorStatus.ordinal)
             call.resolve(data)
         }
     }
-}
-
-
-  @PluginMethod
-fun getSensorStatus(call: PluginCall) {
-    val sahhaSensors = parseSensors(call, "getSensorStatus") ?: return
-    resolveSensorStatus(call, sahhaSensors)
 }
 
 @PluginMethod
 fun enableSensors(call: PluginCall) {
     val sahhaSensors = parseSensors(call, "enableSensors") ?: return
 
-    Sahha.enableSensors(sahhaSensors) { error, _ ->
+    // The native SDK resolves the resulting sensor status in the callback,
+    // so no second getSensorStatus round trip is needed.
+    Sahha.enableSensors(sahhaSensors) { error, sensorStatus ->
         if (error != null) {
             call.reject(error)
         } else {
-            resolveSensorStatus(call, sahhaSensors)
+            val data = JSObject()
+            data.put("status", sensorStatus.ordinal)
+            call.resolve(data)
         }
     }
 }

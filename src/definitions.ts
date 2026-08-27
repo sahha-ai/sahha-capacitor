@@ -175,8 +175,8 @@ export enum SahhaScoreType {
 export enum SahhaBiomarkerCategory {
   activity = 'activity',
   body = 'body',
-  characteristic = 'characteristic',
-  reproductive = 'reproductive',
+  engagement = 'engagement',
+  nutrition = 'nutrition',
   sleep = 'sleep',
   vitals = 'vitals',
 }
@@ -187,7 +187,7 @@ export enum SahhaBiomarkerType {
   active_hours = 'active_hours',
   active_duration = 'active_duration',
   activity_low_intensity_duration = 'activity_low_intensity_duration',
-  activity_mid_intensity_duration = 'activity_mid_intensity_duration',
+  activity_medium_intensity_duration = 'activity_medium_intensity_duration',
   activity_high_intensity_duration = 'activity_high_intensity_duration',
   activity_sedentary_duration = 'activity_sedentary_duration',
   active_energy_burned = 'active_energy_burned',
@@ -203,13 +203,6 @@ export enum SahhaBiomarkerType {
   age = 'age',
   biological_sex = 'biological_sex',
   date_of_birth = 'date_of_birth',
-  menstrual_cycle_length = 'menstrual_cycle_length',
-  menstrual_cycle_start_date = 'menstrual_cycle_start_date',
-  menstrual_cycle_end_date = 'menstrual_cycle_end_date',
-  menstrual_phase = 'menstrual_phase',
-  menstrual_phase_start_date = 'menstrual_phase_start_date',
-  menstrual_phase_end_date = 'menstrual_phase_end_date',
-  menstrual_phase_length = 'menstrual_phase_length',
   sleep_start_time = 'sleep_start_time',
   sleep_end_time = 'sleep_end_time',
   sleep_duration = 'sleep_duration',
@@ -277,7 +270,13 @@ export interface SahhaPlugin {
     startDateTime: number;
     endDateTime: number;
   }): Promise<{ value: string }>;
+  /**
+   * @deprecated Use {@link getBiomarkers} to read server-processed biomarkers instead.
+   */
   getStats(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
+  /**
+   * @deprecated Use {@link getBiomarkers} to read server-processed biomarkers instead.
+   */
   getSamples(options: { sensor: SahhaSensor; startDateTime: number; endDateTime: number }): Promise<{ value: string }>;
   openAppSettings(): Promise<void>;
   /**
