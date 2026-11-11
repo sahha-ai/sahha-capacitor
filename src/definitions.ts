@@ -243,6 +243,11 @@ export interface SahhaSettings {
 }
 
 export interface SahhaDemographic {
+  /**
+   * Deprecated. Not sent to Sahha; send `birthDate` instead.
+   *
+   * @deprecated Not sent to Sahha; send `birthDate` instead. This property will be removed in the next major release.
+   */
   age?: number;
   gender?: string;
   birthDate?: string;
