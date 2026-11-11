@@ -225,13 +225,7 @@ public class SahhaPlugin : Plugin() {
             return
         }
 
-        val gender: String? = demographic.optString("gender")
-        val birthDate: String? = demographic.optString("birthDate")
-
-        var sahhaDemographic = SahhaDemographic(
-            gender = gender?.ifEmpty { null },
-            birthDate = birthDate?.ifEmpty { null },
-        )
+        val sahhaDemographic = parseDemographic(demographic)
         Log.d("Sahha", sahhaDemographic.toString())
 
         Sahha.postDemographic(sahhaDemographic) { error, success ->
@@ -647,3 +641,15 @@ internal fun notificationConfiguration(
         shortDescription = shortDescription ?: default.shortDescription,
     )
 }
+
+/**
+ * Builds the SDK demographic from the object the app passed. A field the app leaves out, sets to
+ * null or sets to an empty string is left unset (null).
+ *
+ * The bridge keeps a JSON null in the object as JSONObject.NULL. JSObject.getString returns null
+ * for it, whereas optString would return the string "null", which is not a valid birth date.
+ */
+internal fun parseDemographic(demographic: JSObject): SahhaDemographic = SahhaDemographic(
+    gender = demographic.getString("gender")?.ifEmpty { null },
+    birthDate = demographic.getString("birthDate")?.ifEmpty { null },
+)

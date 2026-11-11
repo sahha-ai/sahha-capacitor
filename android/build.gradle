@@ -63,6 +63,9 @@ dependencies {
     implementation project(':capacitor-android')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     testImplementation "junit:junit:$junitVersion"
+    // Android's own org.json (from AOSP), so unit tests can build a real JSObject. android.jar has
+    // only stubs, and org.json:json handles a JSON null differently from Android.
+    testImplementation "com.vaadin.external.google:android-json:0.0.20131108.vaadin1"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation "com.google.code.gson:gson:2.9.0"
