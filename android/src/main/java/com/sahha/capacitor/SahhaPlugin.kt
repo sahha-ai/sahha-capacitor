@@ -225,12 +225,10 @@ public class SahhaPlugin : Plugin() {
             return
         }
 
-        val age: Int? = demographic.optInt("age")
         val gender: String? = demographic.optString("gender")
         val birthDate: String? = demographic.optString("birthDate")
 
         var sahhaDemographic = SahhaDemographic(
-            age = if (age == 0) null else age,
             gender = gender?.ifEmpty { null },
             birthDate = birthDate?.ifEmpty { null },
         )

@@ -1,7 +1,7 @@
 import { Sahha, SahhaSensor, SahhaSensorStatus } from 'sahha-capacitor';
 import { SahhaScoreType, SahhaBiomarkerCategory, SahhaBiomarkerType } from '../../../dist/esm/definitions';
 
-const demographicFields = ["gender", "age", "birthDate"];
+const demographicFields = ["gender", "birthDate"];
 const sensors = [SahhaSensor.steps, SahhaSensor.sleep ];
 
 const $ = (id) => document.getElementById(id);
@@ -111,7 +111,7 @@ window.postDemographic = () => {
         localStorage.setItem(field, value);
 
         if (value !== "") {
-            demographic[field] = field === "age" ? parseInt(value, 10) : value;
+            demographic[field] = value;
         } else {
             demographic[field] = null;
         }

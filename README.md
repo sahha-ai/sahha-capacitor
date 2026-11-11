@@ -371,11 +371,11 @@ postSensorData() => Promise<void>
 
 #### SahhaDemographic
 
-| Prop            | Type                |
-| --------------- | ------------------- |
-| **`age`**       | <code>number</code> |
-| **`gender`**    | <code>string</code> |
-| **`birthDate`** | <code>string</code> |
+| Prop            | Type                | Description                                              |
+| --------------- | ------------------- | -------------------------------------------------------- |
+| **`age`**       | <code>number</code> | Deprecated. Not sent to Sahha; send `birthDate` instead. |
+| **`gender`**    | <code>string</code> |                                                          |
+| **`birthDate`** | <code>string</code> |                                                          |
 
 
 ### Enums
